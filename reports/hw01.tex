@@ -137,6 +137,14 @@ You can run it with SBT using something like these commands, depending on your d
   > run-main nlp.cb.NgramEvaluator
                         ../data/penn-treebank3/tagged/pos/brown/ 0.1
 \end{lstlisting}
+%
+I rewrote the BigramModel class as an exercise for my own benefit (and it just so happened that having this code fresh in my mind was very useful for one of my Google internship technical interviews), but the forward bigram model produces input identical to Ray's code.
+
+The whole project (without data) in the proper SBT project directory stucture can be found in the following github repository:
+\begin{lstlisting}
+  git clone https://github.com/chbrown/nlp.git
+\end{lstlisting}
+
 
 % I read through the provided code, and rewrote the BigramModel class in Scala. While \texttt{hw01.scala} is a little over 200 lines, I was able to rewrite the functionality of the 468 lines of code in \texttt{BigramModel.java} and \texttt{DoubleValue.java} file in about 100 lines. It's a bit slower, but I think it makes more sense, the boxed DoubleValue seems like premature optimization, at least with just 1M words.
 
