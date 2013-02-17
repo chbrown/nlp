@@ -1,0 +1,46 @@
+BigramModel debugging:
+
+    def printCounts() {
+      unigram_counts.foreach { case (a, count) =>
+        println("^" + a + ": " + count)
+      }
+      bigram_counts.foreach { case ((a, b), count) =>
+        println(b + "|" + a + ": " + count)
+      }
+    }
+
+If we wanted not to count the unigrams and convert first instances to UNK at the same time:
+
+    val seen = MutableSet("<S>", "</S>", "<UNK>")
+    val unigrams = padded_sentences.flatten.map { token =>
+      if (seen.contains(token)) {
+        token
+      }
+      else {
+        seen += token
+        "<UNK>"
+      }
+    }.toList
+    val unigram_counts = unigrams.groupBy(x => x).mapValues(_.size)
+
+
+If we wanted to do the unigram conversion and counting immutably (takes forEVer):
+
+    // immutable version (slow)
+    val (unigrams, seen) = ((List[String](), Set("<S>", "</S>", "<UNK>")) /: padded_sentences.flatten) { (accumulator, token) =>
+      val (unigrams, seen) = accumulator
+      val next = if (seen.contains(token)) token else "<UNK>"
+      (unigrams :+ next, seen + token)
+    }
+
+  def printMemory() {
+    val mb = 1024*1024
+
+    //Getting the runtime reference from system
+    val runtime = Runtime.getRuntime()
+    println("##### Heap utilization statistics [MB] #####")
+    println("Used Memory: " + (runtime.totalMemory() - runtime.freeMemory()) / mb)
+    println("Free Memory: " + runtime.freeMemory() / mb)
+    println("Total Memory: " + runtime.totalMemory() / mb)
+    println("Max Memory: " + runtime.maxMemory() / mb)
+  }

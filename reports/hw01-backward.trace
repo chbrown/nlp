@@ -1,0 +1,29 @@
+Atis
+# Train Sentences = 519 (# words = 3922)
+# Test Sentences = 58 (# words = 431)
+Training...
+Perplexity = 9.043192013019798
+Word Perplexity = 11.680443791554506
+Testing...
+Perplexity = 19.341388622483773
+Word Perplexity = 27.124810818769507
+
+WSJ
+# Train Sentences = 43820 (# words = 995626)
+# Test Sentences = 4869 (# words = 111718)
+Training...
+Perplexity = 74.26799183241482
+Word Perplexity = 86.65516421729026
+Testing...
+Perplexity = 219.71517777445175
+Word Perplexity = 266.58242877788786
+
+Brown
+# Train Sentences = 47206 (# words = 1079428)
+# Test Sentences = 5246 (# words = 93542)
+Training...
+Perplexity = 93.51945601418618
+Word Perplexity = 110.78194438020648
+Testing...
+Perplexity = 231.33993860160436
+Word Perplexity = 299.8879687737823

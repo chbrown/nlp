@@ -1,0 +1,150 @@
+<html>
+
+<head>
+<title>CS 388 Natural Language Processing: Homework 1</title>
+<style type="text/css">
+  .codevar {
+    color: red;
+    border: 1px solid #999;
+  }
+  code { font-family: monospace;
+         color: #0047AB;
+       }
+  tt { font-family: monospace;
+         color: #0047AB;
+       }
+          .codebox {text-align: left;
+         font-family: monospace;
+            height: auto;
+            overflow: auto;
+            border: #0047AB 1px dashed;
+            background: #E6E6FA;
+            padding: 10px;
+            margin: 1em;
+            width: 70%;
+            min-width: 60em;
+            margin-left: 1em; margin-right: 3em;
+          }
+  pre { padding: 0px; margin: 0px; }
+
+</style>
+</head>
+  
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<center>
+<h1> CS 388 Natural Language Processing <br> Homework 1: N-gram Language Models
+</h1>
+Due: Feb. 18, 2013
+</center>
+<br>
+In this assignment you will explore a modification of a simple, typical N-gram language
+model and experimentally test it on English data.
+
+<h2>Existing Bigram Model</h2>
+
+Java code for a simple bigram language model is on the department file server
+in <code>/u/mooney/cs388-code/nlp/lm/BigramModel.java</code>.  The code uses
+simple linear interpolation with a unigram model for smoothing, just using
+fixed weights (0.9 and 0.1) for combining the bigram and unigram model.  During
+training, it replaces the first occurrence of a token with &lt UNK&gt for
+"unknown" in order to handle novel (out-of-vocabulary, OOV) words encountered
+in testing (which are also replaced with &lt UNK&gt).  It computes complete
+sentence probability and perplexity in log space in order to avoid problems
+with floating-point underflow when multiplying many small probabilities.  Read
+the comments in the code to familiarize yourself with this short program.
+
+<p>
+This model can be trained and tested on sentence-segmented data in the
+Linguistic Data Consortium (LDC)'s Penn Treebank collection.  See the part-of-speech
+tagged (POS) data in <code>/projects/nlp/penn-treebank3/tagged/pos/</code>.
+The class <code>POSTaggedFile</code> in <code>/u/mooney/cs388-code/nlp/lm/</code>
+contains code for extracting tokenized, sentence-segmented text from
+these POS-tagged files, see the comments in this file for details.
+
+<p>
+The <code>main</code> method for <code>BigramModel</code> trains and tests the
+model on LDC tagged files.  It takes a list of tagged files and/or directories
+as arguments and its last argument (a real value between 0 and 1) is the
+fraction of the sentences in this data to use for testing.  See <a
+href="bigram-trace.txt"> a trace file</a> running this program. It shows a
+trace of training and testing the model on the <code>atis</code> (airline
+booking query), <code>wsj</code> (Wall Street Journal text) and
+<code>brown</code> (Brown corpus of mixed-genre text) corpora using the first
+90% of the sentences for training and the last 10% for testing. It shows
+perplexity for both the training and held-out test data.  The additional "Word
+Perplexity" measure excludes the prediction for the end-of-sentence (&lt/S&gt)
+token, which will be used for the comparisons discussed below.
+
+<h2>Your Task: Backward and Bidirectional Bigram Models</h2>
+
+Standard N-gram language models model the generation of text from left to
+right. However, in some cases, tokens might be better predicted from their
+right context rather than their left context.
+
+<p>
+Your first task is to produce a "backward" bigram model that models the
+generation of a sentence from right to left.  Think of a very simple way to very
+quickly use <code>BigramModel</code> to produce a
+<code>BackwardBigramModel</code> that is identical except for the modeling
+direction.  The one significant difference between a left-to-right and a
+right-to-left (backward) model is that the backward model's final prediction is
+to predict sentence-start (&lt S&gt) rather than sentence-end (&lt/S&gt).
+Therefore, the "Word Perplexity" version of the evaluation metric that ignores
+the prediction of sentence boundaries in either direction, is the fairest way
+to compare these two models.
+
+<p>
+Test your backward model on the  <code>atis</code>, <code>wsj</code>, and
+<code>brown</code> corpora and produce a trace analogous to <a
+href="bigram-trace.txt"> the <code>BigramModel</code> trace file</a> for
+<code>BackwardBigramModel</code>.
+
+<p>
+Next build a <code>BidirectionalBigramModel</code> that combines the forward
+and backward model.  When determining the probability of a word in the
+sentence, it should use both the estimate from its forward and backward
+contexts by linearly interpolating the probability predicted for that token by
+the <code>BigramModel</code> and the <code>BackwardBigramModel</code>.  By
+default, just weight the prediction of both models equally when interpolating a
+probability for each word/token in the sentence, although you may try different
+weights if you believe the comparative results from the forward and backward
+model warrant that they be weighted differently.
+
+<p>
+Test your bidirectional model on the  <code>atis</code>, <code>wsj</code>, and
+<code>brown</code> corpora and produce a trace analogous to <a
+href="bigram-trace.txt"> the <code>BigramModel</code> trace file</a> for
+<code>BidirectionalBigramModel</code>.
+
+<p>
+Both your <code>BackwardBigramModel</code> and
+<code>BidirectionalBigramModel</code> should take the same input and produce
+the same style of output as <code>BigramModel</code>, except you only need to
+show the "Word Perplexity" for the bidirectional model. That is, for the
+bidirectional model you should not try to combine the probabilities for
+predicting sentence-start and sentence-end since these are not comparable 
+tasks, so just don't include sentence boundary prediction in the perplexity
+score at all.
+
+<h2>Submission</h2>
+
+Using electronic turnin, submit your code, output trace files, and a
+well-written, coherent, well-formated project report (about 2 pages)
+that includes a nice well-structured table of comparative results and
+includes a discussion that answers at least the following questions:
+
+<ol>
+
+<li> How does the "Word Perplexity" of the backward bigram model (for both training
+and test data) compare to the normal model?  Discuss the reasons for any diferences
+or similarities found.
+
+<li> How does the "Word Perplexity" of the bidirectional model (for both
+training and test data) compare to both the backward model and the normal
+model?  Discuss the reasons for any diferences or similarities found.
+
+</ol>
+
+
+</html>
