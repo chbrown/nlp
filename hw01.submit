@@ -1,3 +1,7 @@
 #!/bin/sh
-turnin --submit nclement cs388-hw1 src/main/scala/nlp/cb/hw01.scala reports/hw01.pdf reports/hw01-backward.trace reports/hw01-bidirectional.trace
+cd ~
+
+mkdir -p hw01
+cp nlp/src/main/scala/nlp/cb/hw01.scala nlp/reports/hw01.pdf nlp/reports/hw01-backward.trace nlp/reports/hw01-bidirectional.trace hw01/
+turnin --submit nclement cs388-hw1 hw01
 turnin --list nclement cs388-hw1

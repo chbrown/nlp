@@ -1,0 +1,170 @@
+
+  // def runSimpleTagger(randomSeed: Int, trainProportion: Double, allInstances: InstanceList): (Double, Double) = {
+
+  // }
+
+      // .opt[Boolean]("train", default=true)
+      // .opt[String]("test", required=true)
+    // trainingFile = null, testFile = null
+    // InstanceList trainingData = null, testData = null
+    // val numEvaluations = 0
+    // val iterationsBetweenEvals = 16
+
+
+
+    // int restArgs = commandOptions.processOptions(args);
+    // if (restArgs == args.length)
+    // {
+    //   commandOptions.printUsage(true);
+    //   throw new IllegalArgumentException("Missing data file(s)");
+    // }
+    // if (trainOption.value)
+    // {
+    //   if (testOption.value != null && restArgs < args.length - 1)
+    //     testFile = new FileReader(new File(args[restArgs+1]));
+    // } else
+    // val testFile = new FileReader(opts[String]("test"))
+
+    // Pipe p = null;
+    // CRF crf = null;
+    // TransducerEvaluator eval = null;
+
+    // if (continueTrainingOption.value || !trainOption.value) {
+    //   if (modelOption.value == null)
+    //   {
+    //     commandOptions.printUsage(true);
+    //     throw new IllegalArgumentException("Missing model file option");
+    //   }
+    // val s = new ObjectInputStream(new FileInputStream(opts[String]("mallet-file")))
+    // val crf = s.readObject().asInstanceOf[CRF]
+    // s.close()
+    // val p = crf.getInputPipe()
+    // }
+    // else {
+    // }
+
+
+    // if (trainOption.value)
+    // {
+    // p.setTargetProcessing(true)
+
+
+    // logger.info
+      // ("Number of features in training data: "+p.getDataAlphabet().size());
+    // if (testOption.value != null)
+    // {
+      // if (testFile != null)
+      // {
+    // val testData = new InstanceList(p);
+    // val testData.addThruPipe(new LineGroupIterator(testFile, "^\\s*$".r, true))
+    //   } else
+    //   {
+    //   }
+    // }
+    // } else if (testOption.value != null)
+    // {
+    //   p.setTargetProcessing(true);
+    //   testData = new InstanceList(p);
+    //   testData.addThruPipe(
+    //       new LineGroupIterator(testFile,
+    //         Pattern.compile("^\\s*$"), true));
+    // } else
+    // {
+    //   p.setTargetProcessing(false);
+    //   testData = new InstanceList(p);
+    //   testData.addThruPipe(
+    //       new LineGroupIterator(testFile,
+    //         Pattern.compile("^\\s*$"), true));
+    // }
+    // logger.info ("Number of predicates: "+p.getDataAlphabet().size());
+
+
+    // if (testOption.value != null)
+    // {
+    //   else if (testOption.value.startsWith("seg="))
+    //   {
+    //     String[] pairs = testOption.value.substring(4).split(",");
+    //     if (pairs.length < 1)
+    //     {
+    //       commandOptions.printUsage(true);
+    //       throw new IllegalArgumentException(
+    //           "Missing segment start/continue labels: " + testOption.value);
+    //     }
+    //     String startTags[] = new String[pairs.length];
+    //     String continueTags[] = new String[pairs.length];
+    //     for (int i = 0; i < pairs.length; i++)
+    //     {
+    //       String[] pair = pairs[i].split("\\.");
+    //       if (pair.length != 2)
+    //       {
+    //         commandOptions.printUsage(true);
+    //         throw new
+    //           IllegalArgumentException(
+    //               "Incorrectly-specified segment start and end labels: " +
+    //               pairs[i]);
+    //       }
+    //       startTags[i] = pair[0];
+    //       continueTags[i] = pair[1];
+    //     }
+    //     eval = new MultiSegmentationEvaluator(new InstanceList[] {trainingData, testData}, new String[] {"Training", "Testing"},
+    //         startTags, continueTags);
+    //   }
+    //   else
+    //   {
+    //     commandOptions.printUsage(true);
+    //     throw new IllegalArgumentException("Invalid test option: " +
+    //         testOption.value);
+    //   }
+    // }
+
+
+
+    // else
+    // {
+    //   if (crf == null)
+    //   {
+    //     if (modelOption.value == null)
+    //     {
+    //       commandOptions.printUsage(true);
+    //       throw new IllegalArgumentException("Missing model file option");
+    //     }
+    //     ObjectInputStream s =
+    //       new ObjectInputStream(new FileInputStream(modelOption.value));
+    //     crf = (CRF) s.readObject();
+    //     s.close();
+    //   }
+      // if (eval != null)
+      //   test(new NoopTransducerTrainer(crf), eval, testData);
+      // else
+      // {
+      //   boolean includeInput = includeInputOption.value();
+      //   for (int i = 0; i < testData.size(); i++)
+      //   {
+      //     Sequence input = (Sequence)testData.get(i).getData();
+      //     Sequence[] outputs = apply(crf, input, nBestOption.value);
+      //     int k = outputs.length;
+      //     boolean error = false;
+      //     for (int a = 0; a < k; a++) {
+      //       if (outputs[a].size() != input.size()) {
+      //         logger.info("Failed to decode input sequence " + i + ", answer " + a);
+      //         error = true;
+      //       }
+      //     }
+      //     if (!error) {
+      //       for (int j = 0; j < input.size(); j++)
+      //       {
+      //          StringBuffer buf = new StringBuffer();
+      //         for (int a = 0; a < k; a++)
+      //            buf.append(outputs[a].get(j).toString()).append(" ");
+      //         if (includeInput) {
+      //           FeatureVector fv = (FeatureVector)input.get(j);
+      //           buf.append(fv.toString(true));
+      //         }
+      //         System.out.println(buf.toString());
+      //       }
+      //       System.out.println();
+      //     }
+      //   }
+      // }
+    // }
+

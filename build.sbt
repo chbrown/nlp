@@ -1,9 +1,3 @@
-//import AssemblyKeys._
-
-//assemblySettings
-
-//seq(com.github.retronym.SbtOneJar.oneJarSettings: _*)
-
 name := "homework"
 
 version := "0.0.1"
@@ -14,34 +8,27 @@ resolvers ++= Seq(
   "Sonatype-snapshots" at "http://oss.sonatype.org/content/repositories/snapshots",
   "apache" at "https://repository.apache.org/content/repositories/releases",
   "gwtwiki" at "http://gwtwiki.googlecode.com/svn/maven-repository/",
-  "repo.codahale.com" at "http://repo.codahale.com"
+  "repo.codahale.com" at "http://repo.codahale.com",
+  "maven.ontotext.com" at "http://maven.ontotext.com/archiva/repository/public",
+  "repo.scalanlp.org" at "http://repo.scalanlp.org/repo",
+  "opennlp.sourceforge.net" at "http://opennlp.sourceforge.net/maven2"
+  //"repo1.maven.org" at "http://repo1.maven.org/maven2/"
 )
 
 libraryDependencies ++= Seq(
   "commons-lang" % "commons-lang" % "2.6",
-  "com.codahale" % "jerkson_2.9.1" % "0.5.0"
-//  "org.scalanlp" %% "breeze-math" % "0.1",
-//  "org.scalanlp" %% "breeze-learn" % "0.1",
-//  "org.scalanlp" %% "breeze-process" % "0.1",
-//  "org.scalanlp" %% "breeze-viz" % "0.1"
+  "com.codahale" % "jerkson_2.9.1" % "0.5.0",
+  "junit" % "junit" % "4.8.2",
+  "bsh" % "bsh" % "2.0b4",
+  "jgrapht" % "jgrapht" % "0.6.0",
+  "jwnl" % "jwnl" % "1.3.3",
+  "trove" % "trove" % "2.0.4",
+  "mtj" % "mtj" % "0.9.9",
+  "org.jdom" % "jdom" % "1.1",
+  "org.rogach" %% "scallop" % "0.8.0"
+  //"cc.mallet" % "mallet" % "2.0.7-RC2"
 )
 
-scalacOptions ++= Seq("-deprecation") // , "-Ydependent-method-types", "-unchecked"
+scalacOptions ++= Seq("-deprecation")
 
-//jarName in assembly := "tacc-hadoop-assembly.jar"
-
-//mainClass in assembly := None
-
-//test in assembly := {}
-
-//mergeStrategy in assembly <<= (mergeStrategy in assembly) { (old) =>
-//  {
-//    case x => {
-//      val oldstrat = old(x)
-//      if (oldstrat == MergeStrategy.deduplicate) MergeStrategy.first
-//      else oldstrat
-//    }
-//  }
-//}
-
-//mainClass in oneJar := None
+resourceDirectory in Compile <<= baseDirectory { _ / "src" }

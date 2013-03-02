@@ -151,3 +151,9 @@ The whole project (without data) in the proper SBT project directory stucture ca
 % \bibliography{~/Dropbox/ut/tex/liography}
 
 \end{document}
+
+Total: 18/20
+Discussion: 6/6
+Results: 12/14
+
+It looks like your calculation for the backward probability is incorrect: you should be doing Count(`ba`)/Count(`b`) instead of Count(`ab`)/Count(`b`). Your numbers are about half of what they should be.
