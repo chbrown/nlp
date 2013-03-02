@@ -131,6 +131,9 @@ class FVOOVTokenAccuracyEvaluator(instanceLists: Array[InstanceList], descriptio
   }
 }
 
+// remote: sbt "run-main nlp.cb.MalletRunner --train-dir /u/chbrown/penn-tagged/pos/atis --train-proportion 0.8 --folds 10 --model hmm"
+// ./sbt "run-main nlp.cb.MalletRunner --train-dir /u/chbrown/penn-tagged/pos/wsj/00 --test-dir /u/chbrown/penn-tagged/pos/wsj/01 --folds 1 --model hmm" >> ~/hw02.out
+
 
 // run-main nlp.cb.MalletRunner --train-dir /Users/chbrown/Dropbox/ut/nlp/data/penn-treebank3/tagged/pos/wsj/mini00 --test-dir /Users/chbrown/Dropbox/ut/nlp/data/penn-treebank3/tagged/pos/wsj/mini01 --folds 10 --model hmm
 // run-main nlp.cb.MalletRunner --train-dir /Users/chbrown/Dropbox/ut/nlp/data/penn-treebank3/tagged/pos/atis --train-proportion 0.8 --folds 10 --model hmm
@@ -214,13 +217,17 @@ object MalletRunner {
 
       // val trainTestRatio = trainSentences.size.toDouble / testSentences.size
 
-      val evaluator = new OOVTokenAccuracyEvaluator(Array(trainInstances, testInstances), Array("Training", "Testing"))
+      val evaluator = if (modelName == "crf")
+        new FVOOVTokenAccuracyEvaluator(Array(trainInstances, testInstances), Array("Training", "Testing"))
+      else
+        new OOVTokenAccuracyEvaluator(Array(trainInstances, testInstances), Array("Training", "Testing"))
 
       // train, test, evaluator, orders, defaultLable, forbidden, allowed, connected, iterations, var, CRF
       val iterations = 500
-      val transducer = if (modelName == "crf")
+      val transducer = if (modelName == "crf") {
         SimpleTagger.train(trainInstances, testInstances, evaluator,
           Array(1), "0", "\\s", ".*", true, iterations, 10.0, null)
+      }
       else {
         // HMMSimpleTagger.train(trainInstances, testInstances, evaluator,
         //   Array(1), "0", "\\s", ".*", true, iterations, 10.0, null)

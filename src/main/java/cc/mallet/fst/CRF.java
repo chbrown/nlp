@@ -8,7 +8,7 @@
 
 
 
-/** 
+/**
 		@author Andrew McCallum <a href="mailto:mccallum@cs.umass.edu">mccallum@cs.umass.edu</a>
  */
 
@@ -80,7 +80,7 @@ import cc.mallet.util.Maths;
 
 	 "probabilities" range from 0 to 1.  High probabilities make a path
 	 more likely.  They are obtained from normalized costs by taking the
-	 log and negating.  
+	 log and negating.
 
 	 "sums of probabilities" range from 0 to positive numbers.  They are
 	 the sum of several probabilities.  These are passed to the
@@ -98,11 +98,11 @@ public class CRF extends Transducer implements Serializable
 
 	protected Alphabet inputAlphabet;
 	protected Alphabet outputAlphabet;
-	
+
 	protected ArrayList<State> states = new ArrayList<State> ();
 	protected ArrayList<State> initialStates = new ArrayList<State> ();
 	protected HashMap<String,State> name2state = new HashMap<String,State> ();
-	
+
 	protected Factors parameters = new Factors ();
 
 	//SparseVector[] weights;
@@ -116,7 +116,7 @@ public class CRF extends Transducer implements Serializable
 	// (permanently disabling) FeatureInducer's and
 	// setWeightsDimensionsAsIn() from using these features on these transitions
 	protected FeatureSelection[] featureSelections;
-	
+
 	// Store here the induced feature conjunctions so that these conjunctions can be added to test instances before transduction
 	protected ArrayList<FeatureInducer> featureInducers = new ArrayList<FeatureInducer>();
 
@@ -124,20 +124,20 @@ public class CRF extends Transducer implements Serializable
 	protected int weightsValueChangeStamp = 0;
 	// An integer index that gets incremented each time this CRFs parameters' structure get changed
 	protected int weightsStructureChangeStamp = 0;
-	
+
 	protected int cachedNumParametersStamp = -1; // A copy of weightsStructureChangeStamp the last time numParameters was calculated
 	protected int numParameters;
-	
-	
+
+
 	/** A simple, transparent container to hold the parameters or sufficient statistics for the CRF. */
 	public static class Factors implements Serializable {
 		public Alphabet weightAlphabet;
 		public SparseVector[] weights; // parameters on transitions, indexed by "weight index"
-		public double[] defaultWeights;// parameters for default features, indexed by "weight index" 
-		public boolean[] weightsFrozen; // flag, if true indicating that the weights of this "weight index" should not be changed by learning, indexed by "weight index" 
+		public double[] defaultWeights;// parameters for default features, indexed by "weight index"
+		public boolean[] weightsFrozen; // flag, if true indicating that the weights of this "weight index" should not be changed by learning, indexed by "weight index"
 		public double [] initialWeights; // indexed by state index
 		public double [] finalWeights; // indexed by state index
-		
+
 		/** Construct a new empty Factors with a new empty weightsAlphabet, 0-length initialWeights and finalWeights, and the other arrays null. */
 		public Factors () {
 			weightAlphabet = new Alphabet();
@@ -146,8 +146,8 @@ public class CRF extends Transducer implements Serializable
 			// Leave the rest as null.  They will get set later by addState() and addWeight()
 			// Alternatively, we could create zero-length arrays
 		}
-		
-		/** Construct new Factors by mimicking the structure of the other one, but with zero values. 
+
+		/** Construct new Factors by mimicking the structure of the other one, but with zero values.
 		 * Always simply point to the other's Alphabet; do not clone it. */
 		public Factors (Factors other) {
 			weightAlphabet = other.weightAlphabet;
@@ -159,7 +159,7 @@ public class CRF extends Transducer implements Serializable
 			initialWeights = new double[other.initialWeights.length];
 			finalWeights = new double[other.finalWeights.length];
 		}
-		
+
 		/** Construct new Factors by copying the other one. */
 		public Factors (Factors other, boolean cloneAlphabet) {
 			weightAlphabet = cloneAlphabet ? (Alphabet) other.weightAlphabet.clone() : other.weightAlphabet;
@@ -171,7 +171,7 @@ public class CRF extends Transducer implements Serializable
 			initialWeights = other.initialWeights.clone();
 			finalWeights = other.finalWeights.clone();
 		}
-		
+
 		/** Construct a new Factors with the same structure as the parameters of 'crf', but with values initialized to zero.
 		 * This method is typically used to allocate storage for sufficient statistics, expectations, constraints, etc. */
 		public Factors (CRF crf) {
@@ -187,7 +187,7 @@ public class CRF extends Transducer implements Serializable
 			initialWeights = new double[crf.parameters.initialWeights.length];
 			finalWeights = new double[crf.parameters.finalWeights.length];
 		}
-		
+
 		public int getNumFactors () {
 			assert (initialWeights.length == finalWeights.length);
 			assert (defaultWeights.length == weights.length);
@@ -196,7 +196,7 @@ public class CRF extends Transducer implements Serializable
 				ret += weights[i].numLocations();
 			return ret;
 		}
-		
+
 		public void zero () {
 			for (int i = 0; i < weights.length; i++)
 				weights[i].setAll(0);
@@ -204,7 +204,7 @@ public class CRF extends Transducer implements Serializable
 			Arrays.fill(initialWeights, 0);
 			Arrays.fill(finalWeights, 0);
 		}
-		
+
 		public boolean structureMatches (Factors other) {
 			if (weightAlphabet.size() != other.weightAlphabet.size()) return false;
 			if (weights.length != other.weights.length) return false;
@@ -217,7 +217,7 @@ public class CRF extends Transducer implements Serializable
 			if (initialWeights.length != other.initialWeights.length) return false;
 			return true;
 		}
-		
+
 		public void assertNotNaN () {
 			for (int i = 0; i < weights.length; i++)
 				assert (!weights[i].isNaN());
@@ -225,7 +225,7 @@ public class CRF extends Transducer implements Serializable
 			assert (!MatrixOps.isNaN(initialWeights));
 			assert (!MatrixOps.isNaN(finalWeights));
 		}
-		
+
 		// gsc: checks all weights to make sure there are no NaN or Infinite values,
     // this method can be called for checking the weights of constraints and
     // expectations but not for crf.parameters since it can have infinite
@@ -237,11 +237,11 @@ public class CRF extends Transducer implements Serializable
 			assert (!MatrixOps.isNaNOrInfinite(initialWeights));
 			assert (!MatrixOps.isNaNOrInfinite(finalWeights));
 		}
-		
+
 		public void plusEquals (Factors other, double factor) {
 			plusEquals(other, factor, false);
 		}
-		
+
 		public void plusEquals (Factors other, double factor, boolean obeyWeightsFrozen) {
 			for (int i = 0; i < weights.length; i++) {
 				if (obeyWeightsFrozen && weightsFrozen[i]) continue;
@@ -253,7 +253,7 @@ public class CRF extends Transducer implements Serializable
 				this.finalWeights[i] += other.finalWeights[i] * factor;
 			}
 		}
-		
+
 		/** Return the log(p(parameters)) according to a zero-mean Gaussian with given variance. */
 		public double gaussianPrior (double variance) {
 			double value = 0;
@@ -279,15 +279,15 @@ public class CRF extends Transducer implements Serializable
 			for (int i = 0; i < initialWeights.length; i++) {
 				// gsc: checking initial/final weights of crf.parameters as well since we could
         // have a state machine where some states have infinite initial and/or final weight
-				if (!Double.isInfinite(initialWeights[i]) && !Double.isInfinite(other.initialWeights[i])) 
+				if (!Double.isInfinite(initialWeights[i]) && !Double.isInfinite(other.initialWeights[i]))
           initialWeights[i] -= other.initialWeights[i] / variance;
-				if (!Double.isInfinite(finalWeights[i]) && !Double.isInfinite(other.finalWeights[i])) 
+				if (!Double.isInfinite(finalWeights[i]) && !Double.isInfinite(other.finalWeights[i]))
           finalWeights[i] -= other.finalWeights[i] / variance;
 			}
 			double w, ow;
 			for (int i = 0; i < weights.length; i++) {
 				if (weightsFrozen[i]) continue;
-				// TODO Note that there doesn't seem to be a way to freeze the initialWeights and finalWeights 
+				// TODO Note that there doesn't seem to be a way to freeze the initialWeights and finalWeights
 				// TODO Should we also obey FeatureSelection here?  No need; it is enforced by the creation of the weights.
 				if (!Double.isInfinite(defaultWeights[i])) defaultWeights[i] -= other.defaultWeights[i] / variance;
 				for (int j = 0; j < weights[i].numLocations(); j++) {
@@ -319,7 +319,7 @@ public class CRF extends Transducer implements Serializable
 			}
 			return value;
 		}
-		
+
 		public void plusEqualsHyperbolicPriorGradient (Factors other, double slope, double sharpness) {
 			// TODO This method could use some careful checking over, especially for flipped negations
 			assert (initialWeights.length == finalWeights.length);
@@ -335,7 +335,7 @@ public class CRF extends Transducer implements Serializable
 			double w, ow;
 			for (int i = 0; i < weights.length; i++) {
 				if (weightsFrozen[i]) continue;
-				// TODO Note that there doesn't seem to be a way to freeze the initialWeights and finalWeights 
+				// TODO Note that there doesn't seem to be a way to freeze the initialWeights and finalWeights
 				// TODO Should we also obey FeatureSelection here?  No need; it is enforced by the creation of the weights.
 				if (!Double.isInfinite(defaultWeights[i])) defaultWeights[i] += ss * Maths.tanh(-other.defaultWeights[i]);
 				for (int j = 0; j < weights[i].numLocations(); j++) {
@@ -345,8 +345,8 @@ public class CRF extends Transducer implements Serializable
 				}
 			}
 		}
-		
-		/** Instances of this inner class can be passed to various inference methods, which can then 
+
+		/** Instances of this inner class can be passed to various inference methods, which can then
 		 * gather/increment sufficient statistics counts into the containing Factor instance. */
 		public class Incrementor implements Transducer.Incrementor {
 			public void incrementFinalState(Transducer.State s, double count) {
@@ -357,20 +357,20 @@ public class CRF extends Transducer implements Serializable
 			}
 			public void incrementTransition(Transducer.TransitionIterator ti, double count) {
 				int index = ti.getIndex();
-				CRF.State source = (CRF.State)ti.getSourceState(); 
+				CRF.State source = (CRF.State)ti.getSourceState();
 				int nwi = source.weightsIndices[index].length;
 				int weightsIndex;
 				for (int wi = 0; wi < nwi; wi++) {
 					weightsIndex = source.weightsIndices[index][wi];
 				// For frozen weights, don't even gather their sufficient statistics; this is how we ensure that the gradient for these will be zero
-					if (weightsFrozen[weightsIndex]) continue; 
+					if (weightsFrozen[weightsIndex]) continue;
 					// TODO Should we also obey FeatureSelection here?  No need; it is enforced by the creation of the weights.
 					weights[weightsIndex].plusEqualsSparse ((FeatureVector)ti.getInput(), count);
 					defaultWeights[weightsIndex] += count;
 				}
 				}
 			}
-		
+
 		public double getParametersAbsNorm ()
 		{
 			double ret = 0;
@@ -388,11 +388,11 @@ public class CRF extends Transducer implements Serializable
 			}
 			return ret;
 		}
-		
+
 		public class WeightedIncrementor implements Transducer.Incrementor {
 			double instanceWeight = 1.0;
-			public WeightedIncrementor (double instanceWeight) { 
-				this.instanceWeight = instanceWeight; 
+			public WeightedIncrementor (double instanceWeight) {
+				this.instanceWeight = instanceWeight;
 			}
 			public void incrementFinalState(Transducer.State s, double count) {
 				finalWeights[s.getIndex()] += count * instanceWeight;
@@ -402,21 +402,21 @@ public class CRF extends Transducer implements Serializable
 			}
 			public void incrementTransition(Transducer.TransitionIterator ti, double count) {
 				int index = ti.getIndex();
-				CRF.State source = (CRF.State)ti.getSourceState(); 
+				CRF.State source = (CRF.State)ti.getSourceState();
 				int nwi = source.weightsIndices[index].length;
 				int weightsIndex;
 				count *= instanceWeight;
 				for (int wi = 0; wi < nwi; wi++) {
 					weightsIndex = source.weightsIndices[index][wi];
 				// For frozen weights, don't even gather their sufficient statistics; this is how we ensure that the gradient for these will be zero
-					if (weightsFrozen[weightsIndex]) continue; 
+					if (weightsFrozen[weightsIndex]) continue;
 					// TODO Should we also obey FeatureSelection here?  No need; it is enforced by the creation of the weights.
 					weights[weightsIndex].plusEqualsSparse ((FeatureVector)ti.getInput(), count);
 					defaultWeights[weightsIndex] += count;
 				}
 			}
 		}
-		
+
 		public void getParameters (double[] buffer)
 		{
 			if (buffer.length != getNumFactors ())
@@ -493,7 +493,7 @@ public class CRF extends Transducer implements Serializable
 				throw new IllegalArgumentException ("index too high = "+index);
 			}
 		}
-		
+
 		// gsc: Serialization for Factors
 		private static final long serialVersionUID = 1;
 		private static final int CURRENT_SERIAL_VERSION = 1;
@@ -506,7 +506,7 @@ public class CRF extends Transducer implements Serializable
 			out.writeObject (initialWeights);
 			out.writeObject (finalWeights);
 		}
-		
+
 		private void readObject (ObjectInputStream in) throws IOException, ClassNotFoundException {
 			int version = in.readInt ();
 			weightAlphabet = (Alphabet) in.readObject ();
@@ -517,7 +517,7 @@ public class CRF extends Transducer implements Serializable
 			finalWeights = (double[]) in.readObject ();
 		}
 	}
-	
+
 	public CRF (Pipe inputPipe, Pipe outputPipe)
 	{
 		super (inputPipe, outputPipe);
@@ -551,12 +551,12 @@ public class CRF extends Transducer implements Serializable
 		this.parameters.weightAlphabet = (Alphabet) initialCRF.parameters.weightAlphabet.clone();
 		//weightAlphabet = (Alphabet) initialCRF.weightAlphabet.clone ();
 		//weights = new SparseVector [initialCRF.weights.length];
-		
+
 		states.clear ();
 		// Clear these, because they will be filled by this.addState()
 		this.parameters.initialWeights = new double[0];
 		this.parameters.finalWeights = new double[0];
-	
+
 		for (int i = 0; i < initialCRF.states.size(); i++) {
 			State s = (State) initialCRF.getState (i);
 			String[][] weightNames = new String[s.weightsIndices.length][];
@@ -564,7 +564,7 @@ public class CRF extends Transducer implements Serializable
 				int[] thisW = s.weightsIndices[j];
 				weightNames[j] = (String[]) initialCRF.parameters.weightAlphabet.lookupObjects(thisW, new String [s.weightsIndices[j].length]);
 			}
-			addState (s.name, initialCRF.parameters.initialWeights[i], initialCRF.parameters.finalWeights[i], 
+			addState (s.name, initialCRF.parameters.initialWeights[i], initialCRF.parameters.finalWeights[i],
 					s.destinationNames, s.labels, weightNames);
 		}
 
@@ -574,13 +574,13 @@ public class CRF extends Transducer implements Serializable
 
 	public Alphabet getInputAlphabet () { return inputAlphabet; }
 	public Alphabet getOutputAlphabet () { return outputAlphabet; }
-	
+
 	/** This method should be called whenever the CRFs weights (parameters) have their structure/arity/number changed. */
 	public void weightsStructureChanged () {
 		weightsStructureChangeStamp++;
 		weightsValueChangeStamp++;
 	}
-	
+
 	/** This method should be called whenever the CRFs weights (parameters) are changed. */
 	public void weightsValueChanged () {
 		weightsValueChangeStamp++;
@@ -1013,7 +1013,7 @@ public class CRF extends Transducer implements Serializable
 	 * @param fullyConnected Whether to include all allowed transitions,
 	 * even those not occurring in <code>trainingSet</code>,
 	 * @return The name of the start state.
-	 * 
+	 *
 	 */
 	public String addOrderNStates(InstanceList trainingSet, int[] orders,
 			boolean[] defaults, String start,
@@ -1105,7 +1105,7 @@ public class CRF extends Transducer implements Serializable
 					}
 					addState (stateName, 0.0, 0.0, destNames, labelNames, weightNames);
 				}
-				for (int o = order-1; o >= 0; o--) 
+				for (int o = order-1; o >= 0; o--)
 					if (++historyIndexes[o] < numLabels)
 					{
 						history[o] = (String)outputAlphabet.lookupObject(historyIndexes[o]);
@@ -1181,9 +1181,9 @@ public class CRF extends Transducer implements Serializable
 
 	public void setDefaultWeight (int widx, double val) {
 		weightsValueChanged();
-		parameters.defaultWeights[widx] = val; 
+		parameters.defaultWeights[widx] = val;
 	}
-	
+
 	// Support for making cc.mallet.optimize.Optimizable CRFs
 
 	public boolean isWeightsFrozen (int weightsIndex)
@@ -1235,7 +1235,7 @@ public class CRF extends Transducer implements Serializable
 	public void setWeightsDimensionAsIn (InstanceList trainingData) {
 		setWeightsDimensionAsIn(trainingData, false);
 	}
-	
+
 	// gsc: changing this to consider the case when trainingData is a mix of labeled and unlabeled data,
 	// and we want to use the unlabeled data as well to set some weights (while using the unsupported trick)
   // *note*: 'target' sequence of an unlabeled instance is either null or is of size zero.
@@ -1250,7 +1250,7 @@ public class CRF extends Transducer implements Serializable
 		for (int i = 0; i < parameters.weights.length; i++)
 			weightsPresent[i] = new BitSet();
 		// Put in the weights that are already there
-		for (int i = 0; i < parameters.weights.length; i++) 
+		for (int i = 0; i < parameters.weights.length; i++)
 			for (int j = parameters.weights[i].numLocations()-1; j >= 0; j--)
 				weightsPresent[i].set (parameters.weights[i].indexAtLocation(j));
 		// Put in the weights in the training set
@@ -1290,7 +1290,7 @@ public class CRF extends Transducer implements Serializable
 				// (do this once some training is done)
 				sumLatticeFactory.newSumLattice (this, input, null, new Transducer.Incrementor() {
 					public void incrementTransition (Transducer.TransitionIterator ti, double count) {
-						if (count < 0.2) // Only create features for transitions with probability above 0.2 
+						if (count < 0.2) // Only create features for transitions with probability above 0.2
 							return;  // This 0.2 is somewhat arbitrary -akm
 						State source = (CRF.State)ti.getSourceState();
 						FeatureVector input = (FeatureVector)ti.getInput();
@@ -1361,7 +1361,7 @@ public class CRF extends Transducer implements Serializable
 		logger.info("Number of weights = "+numWeights);
 		parameters.weights = newWeights;
 	}
-	
+
 	// Create a new weight Vector if weightName is new.
 	public int getWeightsIndex (String weightName)
 	{
@@ -1400,7 +1400,7 @@ public class CRF extends Transducer implements Serializable
 		//setTrainable (false);
 		return wi;
 	}
-	
+
 	private void assertWeightsLength ()
 	{
 		if (parameters.weights != null) {
@@ -1429,12 +1429,12 @@ public class CRF extends Transducer implements Serializable
 	public int getWeightsValueChangeStamp() {
 		return weightsValueChangeStamp;
 	}
-	
+
 	// kedar: access structure stamp method
 	public int getWeightsStructureChangeStamp() {
 		return weightsStructureChangeStamp;
 	}
-	
+
 	public Factors getParameters ()
 	{
 		return parameters;
@@ -1460,7 +1460,7 @@ public class CRF extends Transducer implements Serializable
 	{
 		setParameter(sourceStateIndex, destStateIndex, featureIndex, 0, value);
 	}
-	
+
 	public void setParameter (int sourceStateIndex, int destStateIndex, int featureIndex, int weightIndex, double value)
 	{
 		weightsValueChanged();
@@ -1485,7 +1485,7 @@ public class CRF extends Transducer implements Serializable
 	{
 		return getParameter(sourceStateIndex,destStateIndex,featureIndex,0);
 	}
-	
+
 	public double getParameter (int sourceStateIndex, int destStateIndex, int featureIndex, int weightIndex)
 	{
 		State source = (State)getState(sourceStateIndex);
@@ -1501,7 +1501,7 @@ public class CRF extends Transducer implements Serializable
 			return parameters.defaultWeights[weightsIndex];
     return parameters.weights[weightsIndex].value (featureIndex);
 	}
-	
+
 	public int getNumParameters () {
 		if (cachedNumParametersStamp != weightsStructureChangeStamp) {
 			this.numParameters = 2 * this.numStates() + this.parameters.defaultWeights.length;
@@ -1547,8 +1547,8 @@ public class CRF extends Transducer implements Serializable
 		eval.evaluate (this, true, 0, true, 0.0, null, null, testing);
 		*/
 	}
-	
-	/** When the CRF has done feature induction, these new feature conjunctions must be 
+
+	/** When the CRF has done feature induction, these new feature conjunctions must be
 	 * created in the test or validation data in order for them to take effect. */
 	public void induceFeaturesFor (InstanceList instances) {
 		instances.setFeatureSelection(this.globalFeatureSelection);
@@ -1589,7 +1589,7 @@ public class CRF extends Transducer implements Serializable
 
 		if (parameters.weights == null)
 			out.println ("\n\n*** NO WEIGHTS ***");
-		else {		
+		else {
 			out.println ("\n\n*** CRF WEIGHTS ***");
 			for (int widx = 0; widx < parameters.weights.length; widx++) {
 				out.println ("WEIGHTS NAME = " + parameters.weightAlphabet.lookupObject (widx));
@@ -1639,7 +1639,7 @@ public class CRF extends Transducer implements Serializable
 		out.writeObject (initialStates);
 		out.writeObject (name2state);
 		out.writeObject (parameters);
-		out.writeObject (globalFeatureSelection);		
+		out.writeObject (globalFeatureSelection);
 		out.writeObject (featureSelections);
 		out.writeObject (featureInducers);
 		out.writeInt (weightsValueChangeStamp);
@@ -1657,7 +1657,7 @@ public class CRF extends Transducer implements Serializable
 		initialStates = (ArrayList<State>) in.readObject ();
 		name2state = (HashMap) in.readObject ();
 		parameters = (Factors) in.readObject ();
-		globalFeatureSelection = (FeatureSelection) in.readObject ();		
+		globalFeatureSelection = (FeatureSelection) in.readObject ();
 		featureSelections = (FeatureSelection[]) in.readObject ();
 		featureInducers = (ArrayList<FeatureInducer>) in.readObject ();
 		weightsValueChangeStamp = in.readInt ();
@@ -1666,7 +1666,7 @@ public class CRF extends Transducer implements Serializable
 		numParameters = in.readInt ();
 	}
 
-	
+
 	// Why is this "static"?  Couldn't it be a non-static inner class? (In Transducer also)  -akm 12/2007
 	public static class State extends Transducer.State implements Serializable
 	{
@@ -1728,11 +1728,11 @@ public class CRF extends Transducer implements Serializable
 
 		public void print ()
 		{
-			System.out.println ("State #"+index+" \""+name+"\"");
-			System.out.println ("initialWeight="+crf.parameters.initialWeights[index]+", finalWeight="+crf.parameters.finalWeights[index]);
-			System.out.println ("#destinations="+destinations.length);
+			logger.info("State #"+index+" \""+name+"\"");
+			logger.info("initialWeight="+crf.parameters.initialWeights[index]+", finalWeight="+crf.parameters.finalWeights[index]);
+			logger.info("#destinations="+destinations.length);
 			for (int i = 0; i < destinations.length; i++)
-				System.out.println ("-> "+destinationNames[i]);
+				logger.info("-> "+destinationNames[i]);
 		}
 
 		public int numDestinations () { return destinations.length;}
