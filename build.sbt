@@ -32,3 +32,13 @@ libraryDependencies ++= Seq(
 scalacOptions ++= Seq("-deprecation")
 
 resourceDirectory in Compile <<= baseDirectory { _ / "src" }
+
+//javaOptions += "-Xmx2G"
+
+//javaOptions += "-Djava.util.logging.config.file=src/resources/logging.properties"
+
+//outputStrategy := Some(StdoutOutput)
+
+//logLevel := Level.Error
+
+//https://github.com/sbt/sbt-start-script

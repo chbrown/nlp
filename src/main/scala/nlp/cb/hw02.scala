@@ -77,6 +77,8 @@ object MalletRunner {
               case _ => List()
             }
           } ++ tags
+        case _ => println("Could not find multiple tags in line")
+          List()
       }
       lines.mkString(" ")
     }.mkString("\n")
@@ -133,9 +135,27 @@ object MalletRunner {
       // .opt[String]("model-file")
       .verify
 
-    println("# Corpus & Model & Folds & Training Accuracy & Test Accuracy & Training sentences & Testing sentences & OOV Accuracy & Time (sec)")
+    val columns = List(
+      ("Train", "%s"),
+      ("Test", "%s"),
+      ("Model", "%s"),
+      ("Extras", "%s"),
+      ("Folds", "%d"),
+      ("Training Accuracy", "%.5f"),
+      ("Test Accuracy", "%.5f"),
+      ("Training sentences", "%d"),
+      ("Testing sentences", "%d"),
+      ("OOV Accuracy", "%.5f"),
+      ("Time (sec)", "%.3f")
+    )
+    def cells(values: Map[String, Any], sep: String = " & ") {
+      println(columns.map { case (key, formatter) =>
+        formatter.format(values(key))
+      }.mkString(sep))
+    }
+    // print headers
+    println(columns.map(_._1).mkString(" & "))
 
-    val corpus = opts[String]("train-dir").trim.split("/").dropWhile(_ != "pos").mkString("/")
     val modelName = opts[String]("model").toLowerCase
     val folds = opts[Int]("folds")
     val iterations = 500
@@ -188,9 +208,22 @@ object MalletRunner {
       val (testing, testing_oov) = evaluator.oovEvaluateInstanceList(transducer, testInstances, trainVocabulary)
 
       val ended = System.currentTimeMillis
-      println("%s & %s & %d & %.5f & %.5f & %d & %d & %.5f & %.3f" format
-        (corpus, modelName, folds, training, testing, trainSentences.size, testSentences.size, testing_oov, (ended - started) / 1000.0))
+
+      val result = Map(
+        "Train" -> opts[String]("train-dir").trim.split("/").dropWhile(_ != "pos").mkString("/"),
+        "Test" -> opts.getOrElse[String]("test-dir", "").trim.split("/").dropWhile(_ != "pos").mkString("/"),
+        "Model" -> modelName,
+        "Extras" -> opts[Boolean]("extras"),
+        "Folds" -> folds,
+        "Training Accuracy" -> training,
+        "Test Accuracy" -> testing,
+        "Training sentences" -> trainSentences.size,
+        "Testing sentences" -> testSentences.size,
+        "OOV Accuracy" -> testing_oov,
+        "Time (sec)" -> (ended - started) / 1000.0)
+      cells(result)
     }
+
     // save the model file, for whatever
     // val s = new ObjectOutputStream(new FileOutputStream(opts[String]("model-file")))
     // s.writeObject(crf)
