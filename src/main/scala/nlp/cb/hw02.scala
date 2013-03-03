@@ -209,9 +209,10 @@ object MalletRunner {
 
       val ended = System.currentTimeMillis
 
+      val test = opts.get[String]("test-dir") match { case Some(x) => x case _ => "" }
       val result = Map(
         "Train" -> opts[String]("train-dir").trim.split("/").dropWhile(_ != "pos").mkString("/"),
-        "Test" -> opts.getOrElse[String]("test-dir", "").trim.split("/").dropWhile(_ != "pos").mkString("/"),
+        "Test" -> test.trim.split("/").dropWhile(_ != "pos").mkString("/"),
         "Model" -> modelName,
         "Extras" -> opts[Boolean]("extras"),
         "Folds" -> folds,
