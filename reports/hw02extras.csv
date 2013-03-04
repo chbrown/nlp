@@ -1,0 +1,11 @@
+Train,Test,Model,Extras,Folds,Training Accuracy,Test Accuracy,Training sentences,Testing sentences,OOV Accuracy,Train Time,Test Time,Total Time,Morph Metric
+pos/atis,,crf,true,5,0.99885,0.94548,461,116,0.35294,45.711,0.493,46.204,morph
+pos/atis,,crf,true,5,0.99856,0.94607,461,116,0.33333,46.746,0.345,47.091,morph
+pos/atis,,crf,true,5,0.99884,0.92385,461,116,0.31250,46.057,0.331,46.388,morph
+pos/atis,,crf,true,5,0.99855,0.94323,461,116,0.50000,45.564,0.328,45.892,morph
+pos/atis,,crf,true,5,0.99914,0.93458,461,116,0.35294,47.771,0.340,48.111,morph
+pos/atis,,crf,true,5,0.99885,0.94432,461,116,0.18182,43.465,0.467,43.932,metric
+pos/atis,,crf,true,5,0.99856,0.94494,461,116,0.23810,43.891,0.343,44.234,metric
+pos/atis,,crf,true,5,0.99884,0.93057,461,116,0.30769,43.798,0.339,44.137,metric
+pos/atis,,crf,true,5,0.99855,0.93559,461,116,0.35294,47.172,0.340,47.512,metric
+pos/atis,,crf,true,5,0.99914,0.93224,461,116,0.00000,46.777,0.321,47.098,metric
