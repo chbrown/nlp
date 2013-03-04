@@ -31,12 +31,25 @@ target/start nlp.cb.MalletRunner --train-proportion 0.8 --model crf --folds 10 \
 # run atis crf with extras
 target/start nlp.cb.MalletRunner --train-proportion 0.8 --model crf --extras --folds 10 \
   --train-dir $DATA/penn-treebank3/tagged/pos/atis \
-  >> ../hw02.out
+  >> ../hw02.atis-crfextras.out
 
 # run wsj 00 wsj 01 hmm
+cd nlp
+# pez
 target/start nlp.cb.MalletRunner --model hmm \
-  --train-dir $DATA/penn-treebank3/tagged/wsj/00 \
-  --test-dir $DATA/penn-treebank3/tagged/wsj/01 \
-  >> ../hw02.out
+  --train-dir $DATA/penn-treebank3/tagged/pos/wsj/00 \
+  --test-dir $DATA/penn-treebank3/tagged/pos/wsj/01 \
+  >> ../hw02.wsj00-01hmm.out
 
+# peeps
+target/start nlp.cb.MalletRunner --model crf \
+  --train-dir $DATA/penn-treebank3/tagged/pos/wsj/00 \
+  --test-dir $DATA/penn-treebank3/tagged/pos/wsj/01 \
+  >> ../hw02.wsj00-01crf.out
+
+# polaroid
+target/start nlp.cb.MalletRunner --model crf --extras \
+  --train-dir $DATA/penn-treebank3/tagged/pos/wsj/00 \
+  --test-dir $DATA/penn-treebank3/tagged/pos/wsj/01 \
+  >> ../hw02.wsj00-01crfextras.out
 

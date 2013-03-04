@@ -1,15 +1,83 @@
-\documentclass[10pt]{article}
-\usepackage[pdftex]{graphicx}
+\documentclass[10pt]{article}\usepackage{graphicx, color}
+%% maxwidth is the original width if it is less than linewidth
+%% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\definecolor{fgcolor}{rgb}{0.2, 0.2, 0.2}
+\newcommand{\hlnumber}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlfunctioncall}[1]{\textcolor[rgb]{0.501960784313725,0,0.329411764705882}{\textbf{#1}}}%
+\newcommand{\hlstring}[1]{\textcolor[rgb]{0.6,0.6,1}{#1}}%
+\newcommand{\hlkeyword}[1]{\textcolor[rgb]{0,0,0}{\textbf{#1}}}%
+\newcommand{\hlargument}[1]{\textcolor[rgb]{0.690196078431373,0.250980392156863,0.0196078431372549}{#1}}%
+\newcommand{\hlcomment}[1]{\textcolor[rgb]{0.180392156862745,0.6,0.341176470588235}{#1}}%
+\newcommand{\hlroxygencomment}[1]{\textcolor[rgb]{0.43921568627451,0.47843137254902,0.701960784313725}{#1}}%
+\newcommand{\hlformalargs}[1]{\textcolor[rgb]{0.690196078431373,0.250980392156863,0.0196078431372549}{#1}}%
+\newcommand{\hleqformalargs}[1]{\textcolor[rgb]{0.690196078431373,0.250980392156863,0.0196078431372549}{#1}}%
+\newcommand{\hlassignement}[1]{\textcolor[rgb]{0,0,0}{\textbf{#1}}}%
+\newcommand{\hlpackage}[1]{\textcolor[rgb]{0.588235294117647,0.709803921568627,0.145098039215686}{#1}}%
+\newcommand{\hlslot}[1]{\textit{#1}}%
+\newcommand{\hlsymbol}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlprompt}[1]{\textcolor[rgb]{0.2,0.2,0.2}{#1}}%
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
+\usepackage{fullpage}
+%\usepackage[pdftex]{graphicx}
+%\usepackage{graphicx}
 
 \usepackage{henrian-basic}
 \usepackage{henrian-homework}
-\usepackage{listings}
-\lstset{basicstyle=\smallsize\ttfamily}
+
+\newcommand{\rinline}[1]{SOMETHING WRONG WITH KNITR}
+
 
 
 \usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{subfig}
+\usepackage{hyperref}
+\usepackage{enumerate}
+\usepackage{cancel}
 \usepackage{float}
 \usepackage{booktabs}
+\usepackage[bottom]{footmisc}
+
+\usepackage{beramono}
+\usepackage{listings}
+\lstset{basicstyle=\ttfamily}
 
 \usepackage{natbib}
 \bibliographystyle{plainnat}
@@ -23,27 +91,52 @@
 
 A Hidden Markov Model (HMM) can be used a generative model of a system of linear symbols, like language.
 
-\begin{tabular}
-  Corpus & Training accuracy & Testing accuracy & OOV-only test accuracy & Time \\
-  \midrule
-  Atis & \\
-  WSJ & \\
 
 
+
+
+
+
+\begin{table}[H]
+  \begin{tabular}{lllllr}
+    Model & Corpus & Training accuracy & Testing accuracy & OOV-only & Time \\
+    \midrule
+    HMM   & Atis & 0.888 & 0.865 &
+      0.180 & 2.987 \\
+    CRF   & Atis & 0.999 & 0.928 &
+      0.273 & 84.971 \\
+    CRF+ & Atis & 0.999 & 0.940 &
+      0.440 & 84.570 \\
+    \midrule
+    HMM   & WSJ & 0.862 & 0.785 &
+      0.379 & 51.304 \\
+    CRF   & WSJ & 0.951 & 0.752 &
+      0.431 & 1604.749 \\
+    CRF+ & WSJ & 0.992 & 0.862 &
+      0.626 & 5608.262 \\
+  \end{tabular}
+  \caption{`CRF+' refers to the CRF with additional word-property features; `OOV-only' refers to accuracy on out-of-vocabulary items in the held-out test data.}
+\end{table}
+
+
+
+
+\begin{lstlisting}
+  git clone https://github.com/chbrown/nlp.git
+\end{lstlisting}
+
+\end{document}
 
 cross:
   corpus:     wsj / atis
   model:      crf / hmm
-  oov:        all / only oov
-  train/test: train / both
   features:   with ortho / normal / only ortho
 
 measurements:
   run time
   variables
-
-
-
+  oov:        all / only oov
+  train/test: train / both
 
 Report
 
@@ -56,8 +149,3 @@ Your report should contain a problem statement, the approach that you took to so
 Which features helped the most? (i.e. try only including some feature types and not others)
 If you are ambitious and have time, you might try adding additional types of features of your own design and discuss your results.
 
-\begin{lstlisting}
-  git clone https://github.com/chbrown/nlp.git
-\end{lstlisting}
-
-\end{document}

@@ -66,7 +66,6 @@ object MalletRunner {
   )
 
   def addExtras(sentence: String) = {
-    // sentences.map { sentence =>
     // sentence is just a string with \n separators
     sentence.split("\n").map { line =>
       val lines = line.split(" ").toList match {
@@ -82,11 +81,14 @@ object MalletRunner {
       }
       lines.mkString(" ")
     }.mkString("\n")
-    // }
+  }
+
+  def reverseLines(sentence: String) = {
+    sentence.split("\n").reverse.mkString("\n")
   }
 
   def getTrainTestSentences(trainDirectory: String, testDirectory: Option[String],
-    trainProportion: Option[Double], randomSeed: Int, extraFeatures: Boolean) = {
+    trainProportion: Option[Double], randomSeed: Int, extraFeatures: Boolean, reverse: Boolean) = {
     Treebank2Mallet.convertAllInDirectory(trainDirectory)
 
     val (trainSentences, testSentences) = (testDirectory, trainProportion) match {
@@ -118,10 +120,9 @@ object MalletRunner {
       case _ =>
         (List[String](), List[String]())
     }
-    if (extraFeatures)
-      (trainSentences.map(addExtras), testSentences.map(addExtras))
-    else
-      (trainSentences, testSentences)
+    val mappers = (if (reverse) reverseLines _ else (x: String) => x) compose
+      (if (extraFeatures) addExtras _ else (x: String) => x)
+    (trainSentences.map(mappers), testSentences.map(mappers))
   }
 
   def main(args: Array[String]) = {
@@ -129,6 +130,7 @@ object MalletRunner {
       .opt[String]("train-dir", required=true)
       .opt[String]("test-dir")
       .opt[Boolean]("extras")
+      .opt[Boolean]("reverse")
       .opt[Double]("train-proportion")
       .opt[Int]("folds", default=() => Some(1))
       .opt[String]("model", default=() => Some("crf"))
@@ -171,7 +173,8 @@ object MalletRunner {
       simplePipe.getTargetAlphabet.lookupIndex("0")
 
       val (trainSentences, testSentences) = getTrainTestSentences(opts[String]("train-dir"),
-        opts.get[String]("test-dir"), opts.get[Double]("train-proportion"), 4288 + i, opts[Boolean]("extras"))
+        opts.get[String]("test-dir"), opts.get[Double]("train-proportion"), 4288 + i, opts[Boolean]("extras"),
+        opts[Boolean]("reverse"))
       // trainSentences.foreach { s => println("Sentence " + s) }
       val trainInstances = Instances(trainSentences, simplePipe)
       // solidify the training vocabulary before we add the test instances

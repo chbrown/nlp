@@ -1,0 +1,115 @@
+\documentclass[10pt]{article}
+\usepackage{fullpage}
+%\usepackage[pdftex]{graphicx}
+%\usepackage{graphicx}
+
+\usepackage{henrian-basic}
+\usepackage{henrian-homework}
+
+\newcommand{\rinline}[1]{SOMETHING WRONG WITH KNITR}
+%% begin.rcode setup, include=FALSE
+opts_chunk$set(fig.path='hw02-fig/latex-', cache.path='hw02-cache/latex-', echo=FALSE,
+  fig.align='center', fig.width=6, fig.height=5, out.width='.8\\linewidth')
+
+#fmt = function(x) { sprintf('%.3f', x) }
+fmtmean = function(xs) { sprintf('%.3f', mean(xs)) }
+
+%% end.rcode
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{subfig}
+\usepackage{hyperref}
+\usepackage{enumerate}
+\usepackage{cancel}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage[bottom]{footmisc}
+
+\usepackage{beramono}
+\usepackage{listings}
+\lstset{basicstyle=\ttfamily}
+
+\usepackage{natbib}
+\bibliographystyle{plainnat}
+\bibpunct{(}{)}{,}{a}{,}{,}
+
+\makeHeaders{NLP: Homework 2}
+
+\begin{document}
+
+\section{HMMs and CRFs}
+
+A Hidden Markov Model (HMM) can be used as a generative model of a system of linear symbols, like language. A CRF is a
+
+
+%% begin.rcode echo=FALSE, fig.width=6, fig.height=5, out.width='.8\\linewidth', fig.align='center'
+res = read.csv('hw02.csv')
+hmm_atis = res[res$Train=='pos/atis'&res$Model=='hmm',]
+crf_atis = res[res$Train=='pos/atis'&res$Model=='crf'&res$Extras=='false',]
+crf_atis_extras = res[res$Train=='pos/atis'&res$Model=='crf'&res$Extras=='true',]
+
+hmm_wsj = res[res$Train=='pos/wsj/00'&res$Model=='hmm',]
+crf_wsj = res[res$Train=='pos/wsj/00'&res$Model=='crf'&res$Extras=='false',]
+crf_wsj_extras = res[res$Train=='pos/wsj/00'&res$Model=='crf'&res$Extras=='true',]
+
+#plot(lambdas, type='l',
+#     main=expression(paste('MH random walk of ', lambda, ' parameters')),
+#     xlim=c(.5, 3), ylim=c(1, 4),
+#     xlab=expression(paste(lambda,''[1])),
+#     ylab=expression(paste(lambda,''[2])))
+%% end.rcode
+
+\begin{table}[H]
+  \centering
+  \begin{tabular}{lllllr}
+    Model & Corpus & Training accuracy & Testing accuracy & OOV-only & Time \\
+    \midrule
+    HMM   & Atis & \rinline{fmtmean(hmm_atis$Training.Accuracy)} & \rinline{fmtmean(hmm_atis$Test.Accuracy)} &
+      \rinline{fmtmean(hmm_atis$OOV.Accuracy)} & \rinline{fmtmean(hmm_atis$Time..sec.)} \\
+    CRF   & Atis & \rinline{fmtmean(crf_atis$Training.Accuracy)} & \rinline{fmtmean(crf_atis$Test.Accuracy)} &
+      \rinline{fmtmean(crf_atis$OOV.Accuracy)} & \rinline{fmtmean(crf_atis$Time..sec.)} \\
+    CRF+ & Atis & \rinline{fmtmean(crf_atis_extras$Training.Accuracy)} & \rinline{fmtmean(crf_atis_extras$Test.Accuracy)} &
+      \rinline{fmtmean(crf_atis_extras$OOV.Accuracy)} & \rinline{fmtmean(crf_atis_extras$Time..sec.)} \\
+    \midrule
+    HMM   & WSJ & \rinline{fmtmean(hmm_wsj$Training.Accuracy)} & \rinline{fmtmean(hmm_wsj$Test.Accuracy)} &
+      \rinline{fmtmean(hmm_wsj$OOV.Accuracy)} & \rinline{fmtmean(hmm_wsj$Time..sec.)} \\
+    CRF   & WSJ & \rinline{fmtmean(crf_wsj$Training.Accuracy)} & \rinline{fmtmean(crf_wsj$Test.Accuracy)} &
+      \rinline{fmtmean(crf_wsj$OOV.Accuracy)} & \rinline{fmtmean(crf_wsj$Time..sec.)} \\
+    CRF+ & WSJ & \rinline{fmtmean(crf_wsj_extras$Training.Accuracy)} & \rinline{fmtmean(crf_wsj_extras$Test.Accuracy)} &
+      \rinline{fmtmean(crf_wsj_extras$OOV.Accuracy)} & \rinline{fmtmean(crf_wsj_extras$Time..sec.)} \\
+  \end{tabular}
+  \caption{`CRF+' refers to the CRF with additional word-property features; `OOV-only' refers to accuracy on out-of-vocabulary items in the held-out test data.}
+\end{table}
+
+
+
+
+\begin{lstlisting}
+  git clone https://github.com/chbrown/nlp.git
+\end{lstlisting}
+
+\end{document}
+
+cross:
+  corpus:     wsj / atis
+  model:      crf / hmm
+  features:   with ortho / normal / only ortho
+
+measurements:
+  run time
+  variables
+  oov:        all / only oov
+  train/test: train / both
+
+Report
+
+Your report should contain a problem statement, the approach that you took to solve the problem, a brief discussion of the experiments you ran, including a nicely formatted table(s) of results, with training and test accuracy (both overall and just for OOV items), number of OOV items as a percentage of total test tokens, and run time for each approach for each corpus. Also include a discussion of your results that answers at least the following questions, where possible, explaining the results in terms of underlying algorithmic properties.
+1. How does the overall test accuracy of CRF and HMM differ (when using only tokens) and why?
+2. How does the test accuracy for OOV items for CRF and HMM differ (when using only tokens) and why?
+3. How does the training accuracy of HMM and CRF differ and why?
+4. How does the run time of HMM and CRF differ and why?
+5. How does adding orthographic features affect the accuracy (both overall and OOV) and runtime of the CRF and why?
+Which features helped the most? (i.e. try only including some feature types and not others)
+If you are ambitious and have time, you might try adding additional types of features of your own design and discuss your results.
+
