@@ -130,7 +130,8 @@ The results for a series of comparisons between Mallet's\footnote{MALLET: A Mach
     CRF+ & WSJ & 0.992 & 0.862 &
       0.626 & 5608.262 \\
   \end{tabular}
-  \caption{`CRF+' refers to the CRF with additional word-property features; `OOV-only' refers to accuracy on out-of-vocabulary items in the held-out test data. ATIS refers to a corpus of conversations related to airline reservation; each figure in those rows is the average over a 10-fold train/test split, training on 80\% of the data and testing on the remaining 20\%. WSJ refers to the Wall Street Journal; the models were trained on section 00 and tested on section 01.}
+  \caption{`CRF+' refers to the CRF with additional word-property features; `OOV-only' refers to accuracy on out-of-vocabulary items in the held-out test data. Each accuracy measure is the ratio of correctly labeled tokens to all tokens for that model and corpus.\\
+  ATIS refers to a corpus of conversations related to airline reservation; each figure in those rows is the average over a 10-fold train/test split, training on 80\% of the data and testing on the remaining 20\%. WSJ refers to the Wall Street Journal; the models were trained on section 00 and tested on section 01.}
   \label{table:1}
 \end{table}
 The CRF almost unilaterally beats the HMM in both the very constrained corpus (ATIS) and a more diverse corpus (WSJ). While the results are not state-of-the-art, they clearly indicate the big differences between the HMM and CRF.
@@ -152,6 +153,8 @@ Adding binary morphological features significantly increases accuracy. The CRF+ 
   \item[UPPER] Starts with an uppercase character
 \end{description}
 These features mark a lot of false positives as PLURAL or GERUND, but they still help increase accuracy, particularly on OOV items.
+
+On just the ATIS corpus, I observed short 5-fold runs of the model on two subsets of these features, GERUND+PLURAL and SHORT+UPPER, i.e., morphological vs. orthographical. The difference in test accuracy for the different combinations was negligible (0.938 vs. 0.937, respectively), but the morphological features were far more beneficial in OOV accuracy (0.370 vs. 0.216). The effect that a few simple extra features has on accuracy suggests that adding more might be very helpful. With this small, variable sample, it's hard to make strong claims about training times, but the time difference between training token features and tokens plus extra features does not seem significant.
 
 \subsection{Reversed Model}
 
@@ -192,7 +195,7 @@ Again, all code, with full SBT project, is available at:
 \begin{lstlisting}
   git clone https://github.com/chbrown/nlp.git
 \end{lstlisting}
-Some commands used to run the code can be found in `hw02.README'.
+Commands used to run the code can be found in `hw02.README'.
 
 \end{document}
 

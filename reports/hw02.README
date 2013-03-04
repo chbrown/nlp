@@ -21,7 +21,7 @@ target/start nlp.cb.MalletRunner --train-proportion 0.8 --model crf --folds 10 \
   --train-dir $DATA/penn-treebank3/tagged/pos/atis \
   >> ../hw02.out
 # run atis crf with extras
-target/start nlp.cb.MalletRunner --train-proportion 0.8 --model crf --extras --folds 10 \
+target/start nlp.cb.MalletRunner --train-proportion 0.8 --model crf --extras --folds 5 \
   --train-dir $DATA/penn-treebank3/tagged/pos/atis \
   >> ../hw02.atis-crfextras.out
 
@@ -52,3 +52,5 @@ target/start nlp.cb.MalletRunner --train-dir $DATA/penn-treebank3/tagged/pos/ati
   --folds 10 --model crf --reverse >> ../hw02.atis-reverse.out
 target/start nlp.cb.MalletRunner --train-dir $DATA/penn-treebank3/tagged/pos/atis --train-proportion 0.8 \
   --folds 10 --model crf --extras --reverse >> ../hw02.atis-reverse.out
+
+run-main nlp.cb.MalletRunner --train-proportion 0.8 --model crf --extras --folds 5 --train-dir /Users/chbrown/Dropbox/ut/nlp/data/penn-treebank3/tagged/pos/atis

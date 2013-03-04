@@ -59,8 +59,8 @@ object MalletRunner {
   val cap_min = 'A'
   val cap_max = 'Z'
   val features = List(
-    (token: String) => if (token.endsWith("ing")) "GERUND",
-    (token: String) => if (token.endsWith("s")) "PLURAL",
+    // (token: String) => if (token.endsWith("ing")) "GERUND",
+    // (token: String) => if (token.endsWith("s")) "PLURAL",
     (token: String) => if (token.size < 4) "SHORT",
     (token: String) => if (cap_min <= token(0) && token(0) <= cap_max) "UPPER"
   )
@@ -228,8 +228,8 @@ object MalletRunner {
         "Training sentences" -> trainSentences.size,
         "Testing sentences" -> testSentences.size,
         "OOV Accuracy" -> testing_oov,
-        "Train Time" -> (time_trained - time_started) / 1000.0),
-        "Test Time" -> (time_ended - time_trained) / 1000.0),
+        "Train Time" -> (time_trained - time_started) / 1000.0,
+        "Test Time" -> (time_ended - time_trained) / 1000.0,
         "Total Time" -> (time_ended - time_started) / 1000.0)
       cells(result)
     }
