@@ -1,3 +1,54 @@
 The only changes I made to MALLET were to silence the stdout calls that HMM.State.print and CRF.State.print forced. Those were unfortunately hard-coded, not using the provided, configurable logger.
 
 Other needed changes, such as the extension for OOV accuracy testing, are all performed in hw02.scala.
+
+Commands that I used to produce my results included:
+
+sbt
+> add-start-script-tasks
+> start-script
+> [CTRL-D]
+
+#export DATA=/Users/chbrown/Dropbox/ut/nlp/data
+export DATA=/u/chbrown/data
+
+# run atis hmm
+target/start nlp.cb.MalletRunner --train-proportion 0.8 --model hmm --folds 10 \
+  --train-dir $DATA/penn-treebank3/tagged/pos/atis \
+  >> ../hw02.out
+# run atis crf
+target/start nlp.cb.MalletRunner --train-proportion 0.8 --model crf --folds 10 \
+  --train-dir $DATA/penn-treebank3/tagged/pos/atis \
+  >> ../hw02.out
+# run atis crf with extras
+target/start nlp.cb.MalletRunner --train-proportion 0.8 --model crf --extras --folds 10 \
+  --train-dir $DATA/penn-treebank3/tagged/pos/atis \
+  >> ../hw02.atis-crfextras.out
+
+# run wsj 00 wsj 01 hmm
+cd nlp
+# pez
+target/start nlp.cb.MalletRunner --model hmm \
+  --train-dir $DATA/penn-treebank3/tagged/pos/wsj/00 \
+  --test-dir $DATA/penn-treebank3/tagged/pos/wsj/01 \
+  >> ../hw02.wsj00-01hmm.out
+
+# peeps
+target/start nlp.cb.MalletRunner --model crf \
+  --train-dir $DATA/penn-treebank3/tagged/pos/wsj/00 \
+  --test-dir $DATA/penn-treebank3/tagged/pos/wsj/01 \
+  >> ../hw02.wsj00-01crf.out
+
+# polaroid
+target/start nlp.cb.MalletRunner --model crf --extras \
+  --train-dir $DATA/penn-treebank3/tagged/pos/wsj/00 \
+  --test-dir $DATA/penn-treebank3/tagged/pos/wsj/01 \
+  >> ../hw02.wsj00-01crfextras.out
+
+# atis
+target/start nlp.cb.MalletRunner --train-dir $DATA/penn-treebank3/tagged/pos/atis --train-proportion 0.8 \
+  --folds 10 --model hmm --reverse >> ../hw02.atis-reverse.out
+target/start nlp.cb.MalletRunner --train-dir $DATA/penn-treebank3/tagged/pos/atis --train-proportion 0.8 \
+  --folds 10 --model crf --reverse >> ../hw02.atis-reverse.out
+target/start nlp.cb.MalletRunner --train-dir $DATA/penn-treebank3/tagged/pos/atis --train-proportion 0.8 \
+  --folds 10 --model crf --extras --reverse >> ../hw02.atis-reverse.out
