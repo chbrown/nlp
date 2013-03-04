@@ -1,6 +1,6 @@
 name := "homework"
 
-version := "0.0.1"
+version := "0.0.2"
 
 scalaVersion := "2.10.0"
 
@@ -12,7 +12,6 @@ resolvers ++= Seq(
   "maven.ontotext.com" at "http://maven.ontotext.com/archiva/repository/public",
   "repo.scalanlp.org" at "http://repo.scalanlp.org/repo",
   "opennlp.sourceforge.net" at "http://opennlp.sourceforge.net/maven2"
-  //"repo1.maven.org" at "http://repo1.maven.org/maven2/"
 )
 
 libraryDependencies ++= Seq(
@@ -26,7 +25,6 @@ libraryDependencies ++= Seq(
   "mtj" % "mtj" % "0.9.9",
   "org.jdom" % "jdom" % "1.1",
   "org.rogach" %% "scallop" % "0.8.0"
-  //"cc.mallet" % "mallet" % "2.0.7-RC2"
 )
 
 scalacOptions ++= Seq("-deprecation")
@@ -34,11 +32,3 @@ scalacOptions ++= Seq("-deprecation")
 resourceDirectory in Compile <<= baseDirectory { _ / "src" }
 
 //javaOptions += "-Xmx2G"
-
-//javaOptions += "-Djava.util.logging.config.file=src/resources/logging.properties"
-
-//outputStrategy := Some(StdoutOutput)
-
-//logLevel := Level.Error
-
-//https://github.com/sbt/sbt-start-script

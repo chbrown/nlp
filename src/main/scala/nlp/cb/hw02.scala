@@ -148,7 +148,9 @@ object MalletRunner {
       ("Training sentences", "%d"),
       ("Testing sentences", "%d"),
       ("OOV Accuracy", "%.5f"),
-      ("Time (sec)", "%.3f")
+      ("Train Time", "%.3f"),
+      ("Test Time", "%.3f"),
+      ("Total Time", "%.3f")
     )
     def cells(values: Map[String, Any], sep: String = " & ") {
       println(columns.map { case (key, formatter) =>
@@ -162,7 +164,7 @@ object MalletRunner {
     val folds = opts[Int]("folds")
     val iterations = 500
     (0 until folds).foreach { i =>
-      val started = System.currentTimeMillis
+      val time_started = System.currentTimeMillis
 
       val simplePipe = if (modelName == "crf")
         new SimpleTagger.SimpleTaggerSentence2FeatureVectorSequence()
@@ -207,10 +209,12 @@ object MalletRunner {
         // hmm
       }
 
+      val time_trained = System.currentTimeMillis
+
       val (training, training_oov) = evaluator.oovEvaluateInstanceList(transducer, trainInstances, Set[String]())
       val (testing, testing_oov) = evaluator.oovEvaluateInstanceList(transducer, testInstances, trainVocabulary)
 
-      val ended = System.currentTimeMillis
+      val time_ended = System.currentTimeMillis
 
       val test = opts.get[String]("test-dir") match { case Some(x) => x case _ => "" }
       val result = Map(
@@ -224,7 +228,9 @@ object MalletRunner {
         "Training sentences" -> trainSentences.size,
         "Testing sentences" -> testSentences.size,
         "OOV Accuracy" -> testing_oov,
-        "Time (sec)" -> (ended - started) / 1000.0)
+        "Train Time" -> (time_trained - time_started) / 1000.0),
+        "Test Time" -> (time_ended - time_trained) / 1000.0),
+        "Total Time" -> (time_ended - time_started) / 1000.0)
       cells(result)
     }
 

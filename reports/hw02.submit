@@ -1,0 +1,12 @@
+#!/bin/sh
+TARGET_DIR=hw02-submission
+mkdir -p $TARGET_DIR
+cp ../src/main/scala/nlp/cb/hw02.scala \
+   ../src/main/scala/nlp/cb/treebank.scala \
+   hw02.pdf \
+   hw02.README \
+   $TARGET_DIR
+turnin --submit nclement cs388-hw2 $TARGET_DIR
+
+echo "Submitted! Double-checking results..."
+turnin --list nclement cs388-hw2

@@ -1,0 +1,3 @@
+The only changes I made to MALLET were to silence the stdout calls that HMM.State.print and CRF.State.print forced. Those were unfortunately hard-coded, not using the provided, configurable logger.
+
+Other needed changes, such as the extension for OOV accuracy testing, are all performed in hw02.scala.
