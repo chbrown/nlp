@@ -9,7 +9,7 @@ resolvers ++= Seq(
   "apache" at "https://repository.apache.org/content/repositories/releases",
   "gwtwiki" at "http://gwtwiki.googlecode.com/svn/maven-repository/",
   "repo.codahale.com" at "http://repo.codahale.com",
-  "maven.ontotext.com" at "http://maven.ontotext.com/archiva/repository/public",
+  //"maven.ontotext.com" at "http://maven.ontotext.com/archiva/repository/public",
   "repo.scalanlp.org" at "http://repo.scalanlp.org/repo",
   "opennlp.sourceforge.net" at "http://opennlp.sourceforge.net/maven2"
 )
@@ -24,7 +24,9 @@ libraryDependencies ++= Seq(
   "trove" % "trove" % "2.0.4",
   "mtj" % "mtj" % "0.9.9",
   "org.jdom" % "jdom" % "1.1",
-  "org.rogach" %% "scallop" % "0.8.0"
+  "org.rogach" %% "scallop" % "0.8.0",
+  "edu.stanford.nlp" % "stanford-corenlp" % "1.3.4",
+  "edu.stanford.nlp" % "stanford-parser" % "2.0.4"
 )
 
 scalacOptions ++= Seq("-deprecation")
