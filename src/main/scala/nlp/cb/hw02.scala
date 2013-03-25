@@ -152,13 +152,8 @@ object MalletRunner {
       ("Test Time", "%.3f"),
       ("Total Time", "%.3f")
     )
-    def cells(values: Map[String, Any], sep: String = " & ") {
-      println(columns.map { case (key, formatter) =>
-        formatter.format(values(key))
-      }.mkString(sep))
-    }
-    // print headers
-    println(columns.map(_._1).mkString(" & "))
+    val table = Table(columns, " & ")
+    table.printHeader()
 
     val modelName = opts[String]("model").toLowerCase
     val folds = opts[Int]("folds")
@@ -231,7 +226,7 @@ object MalletRunner {
         "Train Time" -> (time_trained - time_started) / 1000.0,
         "Test Time" -> (time_ended - time_trained) / 1000.0,
         "Total Time" -> (time_ended - time_started) / 1000.0)
-      cells(result)
+      table.printLine(result)
     }
 
     // save the model file, for whatever

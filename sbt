@@ -1,2 +1,1 @@
-java -Xmx16000M -jar sbt-launch.jar "$@"
-
+java -Xmx16G -jar sbt-launch.jar "$@"

@@ -13,3 +13,17 @@ case class FileOut(filePath: String, echo: Boolean = false) {
     writer.close()
   }
 }
+
+case class Table(columns: List[(String, String)], separator: String = " & ") {
+  def join(values: Map[String, Any]) = {
+    columns.map { case (key, fmtstring) =>
+      fmtstring.format(values(key))
+    }.mkString(separator)
+  }
+  def printHeader() {
+    println(columns.map(_._1).mkString(separator))
+  }
+  def printLine(values: Map[String, Any]) {
+    println(join(values))
+  }
+}
