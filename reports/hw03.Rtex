@@ -1,0 +1,86 @@
+\documentclass[10pt]{article}
+
+\usepackage{henrian-basic}
+\usepackage{henrian-homework}
+
+\newcommand{\rinline}[1]{SOMETHING WRONG WITH KNITR}
+%% begin.rcode setup, include=FALSE
+opts_chunk$set(fig.path='hw03-fig/latex-', cache.path='hw03-cache/latex-', echo=FALSE,
+  fig.align='center', fig.width=6, fig.height=5, out.width='.8\\linewidth')#$
+fmtmean = function(xs) { sprintf('%.3f', mean(xs)) }
+%% end.rcode
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{subfig}
+\usepackage{hyperref}
+\usepackage{enumerate}
+\usepackage{cancel}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage[bottom]{footmisc}
+
+\usepackage{beramono}
+\usepackage{listings}
+\lstset{basicstyle=\ttfamily}
+
+\usepackage{natbib}
+\bibliographystyle{plainnat}
+\bibpunct{(}{)}{,}{a}{,}{,}
+
+\makeHeaders{NLP: Homework 3}
+
+\begin{document}
+
+\section{Active Learning}
+
+
+Iteration, Training words, Sample selection function, PCFG F1 score
+1, 1561, random, 0.49576
+2, 1603, random, 0.41039
+3, 1595, random, 0.40158
+4, 1442, random, 0.40347
+5, 1650, random, 0.38817
+6, 1561, random, 0.38799
+7, 1513, random, 0.39092
+8, 1538, random, 0.39804
+9, 1615, random, 0.39944
+10, 1568, random, 0.39976
+11, 1617, random, 0.39420
+12, 1581, random, 0.39490
+13, 1350, random, 0.39540
+14, 1523, random, 0.39905
+15, 1425, random, 0.40239
+16, 1626, random, 0.39900
+17, 1454, random, 0.39260
+18, 1352, random, 0.38055
+19, 1449, random, 0.38952
+20, 1599, random, 0.37036
+
+\subsection{Instructions}
+
+All code and full SBT project, is available at \url{https://github.com/chbrown/nlp.git}. Commands used to run the code can be found in \texttt{hw03.README}.
+
+\end{document}
+
+[4] Using the ParserDemo.java class as a example, develop a simple command line interface to the LexicalizedParser that includes support for active learning. Your package should train a parser on a given training set and evaluate it on a given test set, as with the bundled LexicalizedParser. Additionally, choose a random set of sentences from the "unlabeled" training pool whose word count totals approximately 1500 (this represents approximately 60 additional sentences of average length). Output the original training set plus the annotated versions of the randomly selected sentences as your next training set. Output the remaining "unlabeled" training instances as your next "unlabeled" training pool. Lastly, collect your results for this iteration, including at a minimum the following:
+
+      Iteration number
+      Number of training words
+      The sample selection function
+      PCFG F1 score
+
+[5] Execute 10-20 iterations of your parser for the random selection function, selecting approx 1500 words of additional training data each iteration. You may wish to write a simple test harness script that automates this for you. The random selection function represents a baseline that your more sophisticated sample selection functions should outperform.
+
+[6] Implement the three selection functions describe above (sentence length, normalized probability of the top parse, and tree entropy using the top 10-20 PCFG parses), use each of them to replace random selection in the previous run, and collect results for each. Make sure to collect enough data to plot a learning curve (F1 score versus number of training words) for each sample selection function. Note: if you are sorting by a function that is difficult or costly to compute (such as those requiring parsing of sentences), you may want to compute its value for each instance and cache those values to avoid costly re-parsing.
+
+[7] (Optional) If you have additional time, you may wish to experiment by changing the batch size, initial training set size, or the size of the unlabeled training set.
+
+[Report]
+
+Your hard-copy report (of approximately 4-6 pages) should contain a concise but detailed discussion of the experiments you ran, including nicely formatted learning curves presenting the results. In your discussion, be sure to address at least the following questions:
+
+    Do the active learning methods perform better than random selection of training examples? Why?
+    Does active learning help across the complete learning curve, or are there parts of the learning curve where it performs best? Why?
+    How do the different methods for measuring uncertainty perform compared to each other? Which ones seem to work best? Try to explain any observed differences between methods.
+    How do your results compare to those presented by Hwa (2000)?

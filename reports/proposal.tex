@@ -1,0 +1,112 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{henrian-basic}
+
+% \usepackage[pdftex]{graphicx}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\usepackage{enumerate}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage[bottom]{footmisc}
+\usepackage{beramono}
+\usepackage{listings}
+\lstset{basicstyle=\ttfamily}
+
+\usepackage{natbib}
+\bibliographystyle{plainnat}
+\bibpunct{(}{)}{,}{a}{,}{,}
+
+\title{NLP: Project Proposal}
+\author{Christopher Brown\smallskip\\\href{mailto:chrisbrown@utexas.edu}{chrisbrown@utexas.edu}}
+
+\usepackage{times}
+\usepackage[T2A,T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[russian,english]{babel}
+
+\usepackage{titling}
+\setlength{\droptitle}{-4em}
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent
+Noun phrases occurring in natural language can be described as either definite or indefinite.
+Definiteness is a semantic concept that relates to givenness, familiarity, topicality, and focus.
+It can be denoted by a variety of determiners, the absence of a determiner, or on context.
+This project focuses on the definite markers, \emph{a} and \emph{the}, and inquires what types of models are best at predicting the determiner when it has been deleted.
+\end{abstract}
+
+\section{Semantics of definiteness}
+The theoretical semantics of definite noun phrases has an extensive history; we can start with Gottlob Frege and Bertrand Russell and names. Frege said that the meaning of a name (or definite noun phrase) was the object denoted by that description. Russell complicated matters with his ``The King of France is bald'' example, in which ``the King of France'' cannot refer to anything (at least not since 1848). Russell would call this sentence false, despite the description's failure to refer to anything; the failure of the noun phrase propagates out to the failure of the sentence.
+
+Keith Donnellan and P. F. Strawson disagree, claiming that the sentence is neither true nor false. They argue that the definite noun phrase must denote a unique entity, and if this fails, the sentence is simply incoherent.
+% Donnellan differentiates between attributive and referential uses of definite noun phrases, but that's not important here.
+Compare ``a King of France is bald,'' which can refer to any (dead) past King of France, and thus have a truth value.
+
+
+\section{Applications}
+There are primarily two scenarios where we need to determine the appropriate definiteness of a noun phrase.
+\begin{enumerate}
+  \item \textbf{Generation.} When generating language from a logical structure, we need to know what kind of referential noun phrase to use when representing a certain entity. This is relevant to anaphora generation, but it's simpler; disregarding pronouns for current purposes, if we use a full noun phrase more than once, we need to know when to use an indefinite description and when to use the definite form.
+  \item \textbf{Translation.} Some languages, most notable Russian, do not have determiners to denote definiteness. When translating between these languages and languages with overt definiteness markers, how do we determine where to insert determiners.
+
+  For example, Google Translate renders each alternation of ``\begin{tabular}{@{}c@{}}A\\The\end{tabular} man bit \begin{tabular}{@{}c@{}}a\\the\end{tabular} dog'' as \foreignlanguage{russian}{Человек укусил собаку.} Translating back into English produces ``A person bitten by a dog.'' I don't know Russian; it may be genuinely ambiguous, and only determinable via context; but I know that translating back into English accurately requires choosing the correct determiners, for which we need a model of definiteness (as well as anaphora / centering).
+
+
+\end{enumerate}
+
+\section{Experiment}
+The basic research question will be to determine what type of language model allows the best prediction of definiteness
+
+\end{document}
+
+
+Below are guidlines on how to write-up your report for the final project. Of course, for a short class project, all of the comments may not be relevant. However, please use it as a general guide in structuring your final report.
+
+A standard experimental NLP paper consists of the following sections:
+
+1. Introduction
+
+Motivate and abstractly describe the problem you are addressing and how you are addressing it. What is the problem? Why is it important? What is your basic approach? A short discussion of how it fits into related work in the area is also desirable. Summarize the basic results and conclusions that you will present.
+
+2. Problem Definition and Algorithm
+
+2.1 Task Definition
+
+Precisely define the problem you are addressing (i.e. formally specify the inputs and outputs). Elaborate on why this is an interesting and important problem.
+
+2.2 Algorithm Definition
+
+Describe in reasonable detail the algorithm you are using to address this problem. A psuedocode description of the algorithm you are using is frequently useful. Trace through a concrete example, showing how your algorithm processes this example. The example should be complex enough to illustrate all of the important aspects of the problem but simple enough to be easily understood. If possible, an intuitively meaningful example is better than one with meaningless symbols.
+
+3. Experimental Evaluation
+
+3.1 Methodology
+
+What are criteria you are using to evaluate your method? What specific hypotheses does your experiment test? Describe the experimental methodology that you used. What are the dependent and independent variables? What is the training/test data that was used, and why is it realistic or interesting? Exactly what performance data did you collect and how are you presenting and analyzing it? Comparisons to competing methods that address the same problem are particularly useful.
+
+3.2 Results
+
+Present the quantitative results of your experiments. Graphical data presentation such as graphs and histograms are frequently better than tables. What are the basic differences revealed in the data. Are they statistically significant?
+
+3.3 Discussion
+
+Is your hypothesis supported? What conclusions do the results support about the strengths and weaknesses of your method compared to other methods? How can the results be explained in terms of the underlying properties of the algorithm and/or the data.
+
+4. Related Work
+
+Answer the following questions for each piece of related work that addresses the same or a similar problem. What is their problem and method? How is your problem and method different? Why is your problem and method better?
+
+5. Future Work
+
+What are the major shortcomings of your current method? For each shortcoming, propose additions or enhancements that would help overcome it.
+
+6. Conclusion
+Briefly summarize the important results and conclusions presented in the paper. What are the most important points illustrated by your work? How will your results improve future research and applications in the area?
+
+Bilbiography
+Be sure to include a standard, well-formated, comprehensive bibliography with citations from the text referring to previously published papers in the scientific literature that you utilized or are related to your work.
