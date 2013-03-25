@@ -35,6 +35,7 @@ fmtmean = function(xs) { sprintf('%.3f', mean(xs)) }
 \section{Active Learning}
 
 
+Before initial incrementing was fixed:
 Iteration, Training words, Sample selection function, PCFG F1 score
 1, 1561, random, 0.49576
 2, 1603, random, 0.41039
@@ -56,6 +57,30 @@ Iteration, Training words, Sample selection function, PCFG F1 score
 18, 1352, random, 0.38055
 19, 1449, random, 0.38952
 20, 1599, random, 0.37036
+
+================================================================================
+Iteration, Training words, Sample selection function, PCFG F1 score
+1, 1639, random, 0.49576
+2, 1669, random, 0.42029
+3, 1537, random, 0.42013
+4, 1584, random, 0.40569
+5, 1513, random, 0.40685
+6, 1469, random, 0.40415
+7, 1372, random, 0.40619
+8, 1549, random, 0.40579
+9, 1600, random, 0.40712
+10, 1536, random, 0.40647
+11, 1521, random, 0.40634
+12, 1495, random, 0.40660
+13, 1420, random, 0.40845
+14, 1458, random, 0.40583
+15, 1467, random, 0.40924
+16, 1577, random, 0.40867
+17, 1660, random, 0.40885
+18, 1460, random, 0.41005
+19, 1603, random, 0.41009
+20, 1596, random, 0.41038
+
 
 \subsection{Instructions}
 
