@@ -5,10 +5,43 @@ import scala.util.Random
 import scala.collection.JavaConversions._
 import scala.collection.mutable.ListBuffer
 
-import edu.stanford.nlp.parser.lexparser.{LexicalizedParser, Options}
+import java.io.{PrintWriter, OutputStream}
+import edu.stanford.nlp.parser.lexparser.{LexicalizedParser, TrainOptions, TestOptions, Options, EnglishTreebankParserParams, TreebankLangParserParams}
 import edu.stanford.nlp.io.{NumberRangeFileFilter, RegExFileFilter}
-import edu.stanford.nlp.trees.{Tree, DiskTreebank, MemoryTreebank}
+import edu.stanford.nlp.trees.{Tree, Treebank, DiskTreebank, MemoryTreebank}
 import edu.stanford.nlp.ling.{HasTag, HasWord, TaggedWord}
+
+class NullOutputStream extends OutputStream {
+  override def write(b: Int) { }
+  override def write(b: Array[Byte]) { }
+  override def write(b: Array[Byte], off: Int, len: Int) { }
+  override def close() { }
+  override def flush() { }
+}
+
+class QuietEnglishTreebankParserParams() extends EnglishTreebankParserParams {
+  override def pw(): PrintWriter = {
+    return new PrintWriter(new NullOutputStream())
+  }
+
+  override def pw(o: OutputStream): PrintWriter = {
+    return new PrintWriter(new NullOutputStream())
+  }
+
+  override def display() { }
+}
+
+class QuietTestOptions extends TestOptions {
+  override def display() { }
+}
+class QuietTrainOptions extends TrainOptions {
+  override def display() { }
+}
+class QuietOptions(par: TreebankLangParserParams) extends Options(par) {
+  trainOptions = new QuietTrainOptions()
+  testOptions = new QuietTestOptions()
+  override def display() { }
+}
 
 object ActiveLearner {
   // run-main nlp.cb.ActiveLearner -i 1 -p 1000
@@ -36,7 +69,8 @@ object ActiveLearner {
 
     val penn = sys.env("PENN")
 
-    val options = new Options()
+    val tlp = new QuietEnglishTreebankParserParams()
+    val options = new QuietOptions(tlp)
     options.doDep = false
     options.doPCFG = true
     options.setOptions("-goodPCFG", "-evals", "tsv")
