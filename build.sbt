@@ -29,7 +29,7 @@ libraryDependencies ++= Seq(
   "edu.stanford.nlp" % "stanford-parser" % "2.0.4"
 )
 
-scalacOptions ++= Seq("-deprecation")
+scalacOptions ++= Seq("-unchecked", "-deprecation")
 
 resourceDirectory in Compile <<= baseDirectory { _ / "src" }
 

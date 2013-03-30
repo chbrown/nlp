@@ -1,0 +1,34 @@
+  // def getInputSentence(t: Tree, options: Options, tagger: (Array[_ >: HasWord] => Array[_ >: HasWord])): Array[_ >: HasWord] = {
+  //   if (options.testOptions.forceTags) {
+  //     if (options.testOptions.preTag) {
+  //       val words = t.yieldWords().toArray
+  //       tagger.apply(words)
+  //     } else if(options.testOptions.noFunctionalForcing) {
+  //       val s = t.taggedYield()
+  //       for (word <- s) {
+  //         var has_tag = word.asInstanceOf[HasTag]
+  //         has_tag.setTag(has_tag.tag().split("-").head)
+  //       }
+  //       s.toArray
+  //     } else {
+  //       t.taggedYield().toArray
+  //     }
+  //   } else {
+  //     t.yieldWords().toArray
+  //   }
+  // }
+
+
+  // def activeLearn(initial: Seq[Tree], unlabeled: Seq[Tree], iteration: Int): (Seq[Tree], Seq[Tree]) = {
+  // def activeLearn(initial: Seq[Tree], unlabeled: Seq[Tree], count: Int, options: Options) = {
+  //   val parser = LexicalizedParser.trainFromTreebank(initial.toTreebank, options)
+  //   val (unlabeled_selection, unlabeled_remainder) = Random.shuffle(unlabeled).splitAt(count)
+  //   var training_words = 0
+  //   val unlabeled_selection_reparsed = unlabeled_selection.map { unlabeled_tree =>
+  //     val words = unlabeled_tree.yieldHasWord()
+  //     training_words += words.size
+  //     parser.apply(words)
+  //   }
+  //   (initial ++ unlabeled_selection_reparsed, unlabeled_remainder, training_words)
+  // }
+
