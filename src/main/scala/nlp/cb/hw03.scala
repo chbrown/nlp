@@ -84,14 +84,14 @@ object ActiveLearner {
     var next_initial = initial
     var next_unlabeled = unlabeled.toSeq
 
-    val unlabeled_ordering = opts[String]("selection-method") // "random" "length" "top" "entropy"
+    val selection_method = opts[String]("selection-method") // "random" "length" "top" "entropy"
 
     // Step 5: Execute 10-20 iterations of your parser for the random selection function, selecting approx 1500 words of additional training data each iteration. You may wish to write a simple test harness script that automates this for you. The random selection function represents a baseline that your more sophisticated sample selection functions should outperform.
     for (iteration <- 1 to iterations) {
       val parser = LexicalizedParser.trainFromTreebank(next_initial.toTreebank, options)
 
       // we select the next sentences to train on from the beginning of the unlabeled_sorted list
-      val unlabeled_sorted = unlabeled_ordering match {
+      val unlabeled_sorted = selection_method match {
         case "random" =>
           Random.shuffle(next_unlabeled)
         case "length" =>
@@ -154,7 +154,7 @@ object ActiveLearner {
         "Iteration" -> iteration,
         "Added training words" -> active_training_words,
         "Total training words" -> total_training_words,
-        "Sample selection function" -> "random",
+        "Sample selection method" -> selection_method,
         "PCFG F1 score" -> retrained_parser.parserQuery().testOnTreebank(test)
       )
     }
@@ -164,7 +164,7 @@ object ActiveLearner {
       ("Iteration", "%d"),
       ("Active training added words", "%d"),
       ("Total training words", "%d"),
-      ("Sample selection function", "%s"),
+      ("Sample selection method", "%s"),
       ("PCFG F1 score", "%.5f")
     )
     val table = Table(columns, ", ")

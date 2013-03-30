@@ -82,6 +82,60 @@ Iteration, Training words, Sample selection function, PCFG F1 score
 20, 1596, random, 0.41038
 
 
+
+Iteration, Active training added words, Total training words, Sample selection function, PCFG F1 score
+1, 1529, 2777, random, 0.49576
+2, 1389, 4166, random, 0.42035
+3, 1511, 5677, random, 0.42641
+4, 1582, 7259, random, 0.41862
+5, 1441, 8700, random, 0.41417
+6, 1462, 10162, random, 0.41827
+7, 1599, 11761, random, 0.41846
+8, 1361, 13122, random, 0.41889
+9, 1367, 14489, random, 0.41950
+10, 1421, 15910, random, 0.41800
+11, 1473, 17383, random, 0.41894
+12, 1552, 18935, random, 0.41847
+13, 1614, 20549, random, 0.41455
+14, 1478, 22027, random, 0.41612
+15, 1535, 23562, random, 0.41531
+16, 1612, 25174, random, 0.41531
+17, 1555, 26729, random, 0.41563
+18, 1507, 28236, random, 0.41449
+19, 1450, 29686, random, 0.41967
+20, 1577, 31263, random, 0.41915
+21, 1598, 32861, random, 0.41978
+22, 1517, 34378, random, 0.41898
+23, 1563, 35941, random, 0.41831
+24, 1456, 37397, random, 0.42137
+25, 1376, 38773, random, 0.42086
+26, 1491, 40264, random, 0.42190
+27, 1392, 41656, random, 0.42295
+28, 1587, 43243, random, 0.42208
+29, 1759, 45002, random, 0.42395
+30, 1501, 46503, random, 0.42382
+31, 1521, 48024, random, 0.42453
+32, 1510, 49534, random, 0.42426
+33, 1385, 50919, random, 0.42605
+34, 1512, 52431, random, 0.42562
+35, 1600, 54031, random, 0.42516
+36, 1456, 55487, random, 0.42689
+37, 1612, 57099, random, 0.42621
+38, 1675, 58774, random, 0.42653
+39, 1649, 60423, random, 0.42646
+40, 1543, 61966, random, 0.42700
+41, 1707, 63673, random, 0.42786
+42, 1415, 65088, random, 0.42782
+43, 1466, 66554, random, 0.42718
+44, 1575, 68129, random, 0.42770
+45, 1690, 69819, random, 0.42824
+46, 1540, 71359, random, 0.42861
+47, 1450, 72809, random, 0.42837
+48, 1590, 74399, random, 0.42854
+49, 1342, 75741, random, 0.42860
+50, 1457, 77198, random, 0.42829
+
+
 \subsection{Instructions}
 
 All code and full SBT project, is available at \url{https://github.com/chbrown/nlp.git}. Commands used to run the code can be found in \texttt{hw03.README}.
