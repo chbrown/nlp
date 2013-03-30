@@ -162,7 +162,7 @@ object ActiveLearner {
     println(List.fill(80)("=").mkString)
     val columns = List(
       ("Iteration", "%d"),
-      ("Active training added words", "%d"),
+      ("Added training words", "%d"),
       ("Total training words", "%d"),
       ("Sample selection method", "%s"),
       ("PCFG F1 score", "%.5f")
