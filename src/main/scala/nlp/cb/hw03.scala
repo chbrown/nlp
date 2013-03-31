@@ -122,6 +122,7 @@ object ActiveLearner {
 
     // Step 5: Execute 10-20 iterations of your parser for the random selection function, selecting approx 1500 words of additional training data each iteration. You may wish to write a simple test harness script that automates this for you. The random selection function represents a baseline that your more sophisticated sample selection functions should outperform.
     for (iteration <- 1 to iterations) {
+      println("Iteration #" + iteration)
       val parser = LexicalizedParser.trainFromTreebank(next_initial.toTreebank, options)
 
       // we select the next sentences to train on from the beginning of the unlabeled_sorted list
@@ -147,11 +148,11 @@ object ActiveLearner {
             math.pow(best_score, 1.0 / (sentence.size - 1))
           }.reverse
         case "entropy" =>
-          // we are seeking low entropy, so don't resort
-          next_unlabeled.sortBy { unlabeled_tree =>
-            val k = 20
+          val k = 20
+          val tree_entropies = next_unlabeled.map { unlabeled_tree =>
             val parserQuery = parser.parserQuery()
-            val sentence = unlabeled_tree.yieldHasWord()
+            val sentence = unlabeled_tree.yieldWords()
+            // println("sentence: " + sentence.map(_.word).mkString(" "))
             val tree_entropy = if (parserQuery.parse(sentence)) {
               val top_k_parses = parserQuery.getKBestPCFGParses(k)
               // top_parses(0).score is a log prob, so we exponentiate
@@ -160,13 +161,16 @@ object ActiveLearner {
               val p_sentence = top_k_probabilities.sum
               val top_k_normalized = top_k_probabilities.map(_/p_sentence)
 
-              -top_k_normalized.map { p => p * log2(p) }.sum
+              top_k_normalized.map { p => p * log2(p) }.sum * -1
             }
             else {
               Double.PositiveInfinity
             }
             tree_entropy / sentence.size
           }
+          // zip up with the entropies for sorting, and then drop them
+          // we are seeking low entropy, so don't reverse
+          next_unlabeled.zip(tree_entropies).sortBy(_._2).map(_._1)
       }
 
       val (unlabeled_selection, unlabeled_remainder) = unlabeled_sorted.splitAt(sentences_per_iteration)
