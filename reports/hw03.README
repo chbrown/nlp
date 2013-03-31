@@ -9,3 +9,5 @@ run-main nlp.cb.ActiveLearner --initial-labeled 50 --iterations 75 --sentences-p
 run-main nlp.cb.ActiveLearner --initial-labeled 50 --iterations 75 --sentences-per-iteration 60 --selection-method entropy
 
 
+submit
+

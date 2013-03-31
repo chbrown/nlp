@@ -1,11 +1,12 @@
 // Copyright 2013 Christopher Brown, MIT Licensed
 package nlp.cb
-import org.rogach.scallop._
+import scala.language.implicitConversions
 import scala.util.Random
 import scala.collection.JavaConversions._
 import scala.collection.mutable.ListBuffer
-
 import java.io.{PrintWriter, OutputStream}
+
+import org.rogach.scallop._
 import edu.stanford.nlp.parser.lexparser.{LexicalizedParser, TrainOptions, TestOptions, Options, EnglishTreebankParserParams, TreebankLangParserParams}
 import edu.stanford.nlp.io.{NumberRangeFileFilter, RegExFileFilter}
 import edu.stanford.nlp.trees.{Tree, Treebank, DiskTreebank, MemoryTreebank}

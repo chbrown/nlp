@@ -2,14 +2,21 @@
 import os
 import time
 import argparse
+from datetime import datetime
 
 parser = argparse.ArgumentParser(description='Condor submit helper.')
-parser.add_argument('--homework', type=int, default=3)
-parser.add_argument('--stdout')
-parser.add_argument('--stderr')
-#parser.add_argument('args', nargs='+')
+parser.add_argument('--homework', type=int, default=3, help="The number of this homework (an integer).")
+parser.add_argument('--id', type=str, help="ID used in output filenames. Defaults to the first item of arguments, if not specified here.")
 parser.add_argument('arguments')
 opts = parser.parse_args()
+
+user_tmp = os.path.expanduser('~/tmp')
+if not os.path.exists(user_tmp):
+    os.makedirs(user_tmp)
+
+job_id = '%s-%s' % (opts.id or opts.arguments.split()[0], datetime.today().isoformat())
+stdout = '%s/%s.out' % (user_tmp, job_id)
+stderr = '%s/%s.err' % (user_tmp, job_id)
 
 job = '''
 universe = vanilla
@@ -26,19 +33,14 @@ Arguments = %s
 Notification = complete
 Notify_user = chrisbrown@utexas.edu
 
-''' % (opts.arguments, opts.homework)
+Output = %s
+Error = %s
 
-if opts.stdout:
-    job += 'Output = %s\n' % os.path.expanduser(opts.stdout)
-if opts.stderr:
-    job += 'Error = %s\n' % os.path.expanduser(opts.stderr)
+Queue 1
+''' % (opts.arguments, opts.homework, stdout, stderr)
 
-job += 'Queue 1\n\n'
+job_path = '%s/%s.job' % (user_tmp, job_id)
 
-user_tmp = os.path.expanduser('~/tmp')
-if not os.path.exists(user_tmp):
-    os.makedirs(user_tmp)
-job_path = os.path.join(user_tmp, '%s-%d.job' % (opts.arguments.split()[0], int(time.time())))
 with open(job_path, 'w') as fp:
     fp.write(job)
 
