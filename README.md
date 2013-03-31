@@ -14,3 +14,10 @@ You're gonna need to install the SBT start-script plugin real quick, first:
 
     https://github.com/sbt/sbt-start-script
 
+
+
+
+
+## Misc
+
+Unused java / scala command line option: `-XX:+CMSClassUnloadingEnabled`

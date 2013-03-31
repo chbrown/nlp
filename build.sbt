@@ -1,15 +1,14 @@
 name := "homework"
 
-version := "0.0.3"
+version := "0.3.3"
 
-scalaVersion := "2.10.0"
+scalaVersion := "2.10.1"
 
 resolvers ++= Seq(
   "Sonatype-snapshots" at "http://oss.sonatype.org/content/repositories/snapshots",
   "apache" at "https://repository.apache.org/content/repositories/releases",
   "gwtwiki" at "http://gwtwiki.googlecode.com/svn/maven-repository/",
   "repo.codahale.com" at "http://repo.codahale.com",
-  //"maven.ontotext.com" at "http://maven.ontotext.com/archiva/repository/public",
   "repo.scalanlp.org" at "http://repo.scalanlp.org/repo",
   "opennlp.sourceforge.net" at "http://opennlp.sourceforge.net/maven2"
 )

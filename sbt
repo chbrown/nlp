@@ -1,1 +1,2 @@
-java -Xmx10G -jar sbt-launch.jar "$@"
+#!/bin/sh
+java -Xmx10G -XX:MaxPermSize=512M -jar sbt-launch.jar "$@"

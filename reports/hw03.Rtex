@@ -241,6 +241,58 @@ Iteration, Added training words, Total training words, Sample selection method, 
 
 
 
+Iteration, Added training words, Total training words, Sample selection method, PCFG F1 score
+1, 3832, 5080, entropy, 0.47064
+2, 3200, 8280, entropy, 0.47277
+3, 2963, 11243, entropy, 0.46113
+4, 2847, 14090, entropy, 0.46623
+5, 2767, 16857, entropy, 0.46896
+6, 2604, 19461, entropy, 0.47146
+7, 2521, 21982, entropy, 0.47286
+8, 2399, 24381, entropy, 0.47058
+9, 2353, 26734, entropy, 0.46991
+10, 2309, 29043, entropy, 0.46995
+11, 2263, 31306, entropy, 0.47312
+12, 2250, 33556, entropy, 0.46910
+13, 1768, 35324, entropy, 0.47042
+14, 2115, 37439, entropy, 0.46948
+15, 2063, 39502, entropy, 0.46967
+16, 2005, 41507, entropy, 0.47151
+17, 1980, 43487, entropy, 0.47064
+18, 2001, 45488, entropy, 0.47140
+19, 1870, 47358, entropy, 0.47172
+20, 1920, 49278, entropy, 0.47143
+21, 1780, 51058, entropy, 0.47157
+22, 1846, 52904, entropy, 0.47332
+23, 1780, 54684, entropy, 0.47388
+24, 1799, 56483, entropy, 0.47432
+25, 1726, 58209, entropy, 0.47432
+26, 1721, 59930, entropy, 0.47520
+27, 1679, 61609, entropy, 0.47646
+28, 1604, 63213, entropy, 0.47636
+29, 1717, 64930, entropy, 0.47577
+30, 1620, 66550, entropy, 0.47580
+31, 1611, 68161, entropy, 0.47584
+32, 1569, 69730, entropy, 0.47638
+33, 1435, 71165, entropy, 0.47577
+34, 1514, 72679, entropy, 0.47632
+35, 1532, 74211, entropy, 0.47649
+36, 1498, 75709, entropy, 0.47690
+37, 1483, 77192, entropy, 0.47720
+38, 1456, 78648, entropy, 0.47774
+39, 1367, 80015, entropy, 0.47804
+40, 1393, 81408, entropy, 0.47732
+41, 1425, 82833, entropy, 0.47733
+42, 1397, 84230, entropy, 0.47770
+43, 1371, 85601, entropy, 0.47821
+44, 1353, 86954, entropy, 0.47847
+45, 1306, 88260, entropy, 0.47813
+46, 1290, 89550, entropy, 0.47837
+47, 1252, 90802, entropy, 0.47857
+48, 1227, 92029, entropy, 0.47850
+49, 1213, 93242, entropy, 0.47855
+50, 1191, 94433, entropy, 0.47976
+
 \subsection{Instructions}
 
 All code and full SBT project, is available at \url{https://github.com/chbrown/nlp.git}. Commands used to run the code can be found in \texttt{hw03.README}.
