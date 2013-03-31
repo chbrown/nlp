@@ -7,7 +7,8 @@ parser = argparse.ArgumentParser(description='Condor submit helper.')
 parser.add_argument('--homework', type=int, default=3)
 parser.add_argument('--stdout')
 parser.add_argument('--stderr')
-parser.add_argument('args', nargs='+')
+#parser.add_argument('args', nargs='+')
+parser.add_argument('arguments')
 opts = parser.parse_args()
 
 job = '''
@@ -25,18 +26,19 @@ Arguments = %s
 Notification = complete
 Notify_user = chrisbrown@utexas.edu
 
-Queue 1
-''' % (' '.join(opts.args), opts.homework)
+''' % (opts.arguments, opts.homework)
 
 if opts.stdout:
     job += 'Output = %s\n' % os.path.expanduser(opts.stdout)
 if opts.stderr:
     job += 'Error = %s\n' % os.path.expanduser(opts.stderr)
 
+job += 'Queue 1\n\n'
+
 user_tmp = os.path.expanduser('~/tmp')
 if not os.path.exists(user_tmp):
     os.makedirs(user_tmp)
-job_path = os.path.join(user_tmp, '%s-%d.job' % (opts.args[0], int(time.time())))
+job_path = os.path.join(user_tmp, '%s-%d.job' % (opts.arguments.split()[0], int(time.time())))
 with open(job_path, 'w') as fp:
     fp.write(job)
 
