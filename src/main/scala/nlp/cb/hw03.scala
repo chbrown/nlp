@@ -176,7 +176,7 @@ object ActiveLearner {
             }
             // take the n - 1'th root as a way of normalizing
             math.pow(best_score, 1.0 / (sentence.size - 1))
-          }.reverse
+          }
         case "entropy" =>
           val k = 20
           val tree_entropies = next_unlabeled.map { unlabeled_tree =>
@@ -200,7 +200,7 @@ object ActiveLearner {
           }
           // zip up with the entropies for sorting, and then drop them
           // we are seeking low entropy, so don't reverse
-          next_unlabeled.zip(tree_entropies).sortBy(_._2).map(_._1)
+          next_unlabeled.zip(tree_entropies).sortBy(_._2).map(_._1).reverse
       }
 
       val (unlabeled_selection, unlabeled_remainder) = unlabeled_sorted.splitAt(sentences_per_iteration)

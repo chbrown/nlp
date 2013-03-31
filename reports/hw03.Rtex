@@ -38,7 +38,7 @@ library(ggplot2)
 
 \section{Active Learning}
 
-A common scenario in machine learning is
+A common scenario in natural language processing is having far more data than annotations.
 
 
 % , echo=TRUE
