@@ -1,3 +1,5 @@
+import com.typesafe.sbt.SbtStartScript
+
 name := "homework"
 
 version := "0.3.3"
@@ -33,3 +35,5 @@ scalacOptions ++= Seq("-unchecked", "-deprecation")
 resourceDirectory in Compile <<= baseDirectory { _ / "src" }
 
 //javaOptions += "-Xmx2G"
+
+seq(SbtStartScript.startScriptForClassesSettings: _*)
