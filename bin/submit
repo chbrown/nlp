@@ -14,7 +14,8 @@ user_tmp = os.path.expanduser('~/tmp')
 if not os.path.exists(user_tmp):
     os.makedirs(user_tmp)
 
-job_id = '%s-%s' % (opts.id or opts.arguments.split()[0], datetime.today().isoformat())
+iso = datetime.today().isoformat().split('.')[0].replace(':', '-')
+job_id = '%s-%s' % (opts.id or opts.arguments.split()[0], iso)
 stdout = '%s/%s.out' % (user_tmp, job_id)
 stderr = '%s/%s.err' % (user_tmp, job_id)
 
