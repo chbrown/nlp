@@ -6,7 +6,7 @@
 \newcommand{\rinline}[1]{SOMETHING WRONG WITH KNITR}
 %% begin.rcode setup, include=FALSE
 opts_chunk$set(fig.path='hw03-fig/latex-', cache.path='hw03-cache/latex-', echo=FALSE,
-  fig.align='center', fig.width=6, fig.height=5, out.width='.8\\linewidth', size='small')#$
+  fig.align='center', fig.width=7, fig.height=4, out.width='.95\\linewidth', size='small')#$
 fmtmean = function(xs) { sprintf('%.3f', mean(xs)) }
 library(ggplot2)
 %% end.rcode
@@ -42,9 +42,15 @@ A common scenario in machine learning is
 
 
 % , echo=TRUE
+
 %% begin.rcode 'plots'
-read.csv('hw03-results.csv')
-hi = 3
+#read.csv('hw03-results.csv')
+#hi = 3
+tab = read.csv('hw03-results.csv')
+
+ggplot(tab, aes(x=iteration, y=f1, colour=selection, linetype=selection)) + geom_path() +
+  ylab("PCFG F1 Score") + xlab("Iteration")
+
 %% end.rcode
 
 \subsection{Instructions}

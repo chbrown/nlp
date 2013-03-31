@@ -3,5 +3,9 @@ You'll need to set an environment variable to tell the parser where your Penn tr
 
     export PENN=/projects/nlp/penn-treebank3
 
-run-main nlp.cb.ActiveLearner --initial-labeled 1000 --iterations 2 --sentences-per-iteration 60 --selection-method entropy
+run-main nlp.cb.ActiveLearner --initial-labeled 50 --iterations 75 --sentences-per-iteration 60 --selection-method random
+run-main nlp.cb.ActiveLearner --initial-labeled 50 --iterations 75 --sentences-per-iteration 60 --selection-method length
+run-main nlp.cb.ActiveLearner --initial-labeled 50 --iterations 75 --sentences-per-iteration 60 --selection-method top
+run-main nlp.cb.ActiveLearner --initial-labeled 50 --iterations 75 --sentences-per-iteration 60 --selection-method entropy
+
 

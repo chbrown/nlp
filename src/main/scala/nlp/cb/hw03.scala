@@ -127,11 +127,12 @@ object ActiveLearner {
       val sep = List.fill(80)("-").mkString
       println(sep)
       val columns = List(
-        ("Iteration", "%d"),
-        ("Added training words", "%d"),
-        ("Total training words", "%d"),
-        ("Sample selection method", "%s"),
-        ("PCFG F1 score", "%.5f")
+        ("iteration", "%d"),
+        ("added", "%d"),
+        ("total", "%d"),
+        ("selection", "%s"),
+        ("f1", "%.5f"),
+        ("time", "%d")
       )
       val table = Table(columns, ", ")
       table.printHeader()
@@ -146,6 +147,7 @@ object ActiveLearner {
     var next_unlabeled = unlabeled.toSeq
 
     val selection_method = opts[String]("selection-method") // "random" "length" "top" "entropy"
+    val time_started = System.currentTimeMillis
 
     // Step 5: Execute 10-20 iterations of your parser for the random selection function, selecting approx 1500 words of additional training data each iteration. You may wish to write a simple test harness script that automates this for you. The random selection function represents a baseline that your more sophisticated sample selection functions should outperform.
     for (iteration <- 1 to iterations) {
@@ -201,12 +203,13 @@ object ActiveLearner {
       }
 
       val (unlabeled_selection, unlabeled_remainder) = unlabeled_sorted.splitAt(sentences_per_iteration)
-      val unlabeled_selection_reparsed = unlabeled_selection.map { unlabeled_tree =>
-        parser.apply(unlabeled_tree.yieldHasWord())
-      }
+      // Oh, wait,
+      // val unlabeled_selection_reparsed = unlabeled_selection.map { unlabeled_tree =>
+      //   parser.apply(unlabeled_tree.yieldHasWord())
+      // }
 
       // update
-      next_initial = next_initial ++ unlabeled_selection_reparsed
+      next_initial = next_initial ++ unlabeled_selection
       next_unlabeled = unlabeled_remainder
 
       // other than going through again and counting the unlabeled_section words,
@@ -216,11 +219,12 @@ object ActiveLearner {
 
       val retrained_parser = LexicalizedParser.trainFromTreebank(next_initial.toTreebank, options)
       results += Map(
-        "Iteration" -> iteration,
-        "Added training words" -> active_training_words,
-        "Total training words" -> total_training_words,
-        "Sample selection method" -> selection_method,
-        "PCFG F1 score" -> retrained_parser.parserQuery().testOnTreebank(test)
+        "iteration" -> iteration,
+        "added" -> active_training_words,
+        "total" -> total_training_words,
+        "selection" -> selection_method,
+        "f1" -> retrained_parser.parserQuery().testOnTreebank(test),
+        "time" -> System.currentTimeMillis - time_started
       )
 
       printResults(results)
