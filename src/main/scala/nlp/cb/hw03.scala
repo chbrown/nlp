@@ -224,7 +224,7 @@ object ActiveLearner {
         "total" -> total_training_words,
         "selection" -> selection_method,
         "f1" -> retrained_parser.parserQuery().testOnTreebank(test),
-        "time" -> System.currentTimeMillis - time_started
+        "time" -> (System.currentTimeMillis - time_started)
       )
 
       printResults(results)
