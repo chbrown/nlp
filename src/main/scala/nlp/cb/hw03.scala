@@ -44,8 +44,6 @@ class QuietOptions(par: TreebankLangParserParams) extends Options(par) {
 }
 
 object ActiveLearner {
-  // run-main nlp.cb.ActiveLearner -i 1 -p 1000
-  // --train-dir $PENN/parsed/mrg/wsj/ --test-dir $PENN/parsed/mrg/wsj/
   class TreebankWrapper(trees: Seq[Tree]) {
     def toTreebank = {
       val treebank = new MemoryTreebank()
@@ -60,11 +58,10 @@ object ActiveLearner {
 
   def main(args: Array[String]) {
     val opts = Scallop(args.toList)
-      // .opt[String]("train-dir")
-      // .opt[String]("test-dir")
-      .opt[Int]("iterations", required=true, short='i')
-      .opt[Int]("sentences-per-iteration", required=true, short='p')
-      .opt[String]("selection-method", required=true, short='s')
+      .opt[Int]("initial-labeled", required=true)
+      .opt[Int]("iterations", required=true)
+      .opt[Int]("sentences-per-iteration", required=true)
+      .opt[String]("selection-method", required=true)
       .verify
 
     val penn = sys.env("PENN")
@@ -95,7 +92,20 @@ object ActiveLearner {
     wsj_00.loadPath(penn+"/parsed/mrg/wsj/00")
     wsj_00.textualSummary
     // the Stanford NLP is pretty awesome, because if I don't run the textualSummary, training the parser will break later
-    val initial = wsj_00.toSeq.take(50)
+    val initial_count = opts[Int]("initial-labeled")
+    println("wsj_00: " + wsj_00.size + " " + initial_count)
+    val initial = wsj_00.toSeq.filter { tree =>
+      // Stanford parser is so cool that the only way you can determine whether a single sentence
+      // will break it is by trying to train a parser on a treebank of just that sentence.
+      try {
+        LexicalizedParser.trainFromTreebank(List(tree).toTreebank, options)
+        true
+      } catch {
+        case e: java.lang.StringIndexOutOfBoundsException =>
+          println("Cannot train on sentence: " + tree.yieldWords().map(_.word()).mkString(" "))
+          false
+      }
+    }.take(initial_count)
 
     val unlabeled = new MemoryTreebank()
     unlabeled.loadPath(penn+"/parsed/mrg/wsj/01")
@@ -112,6 +122,23 @@ object ActiveLearner {
     val sentences_per_iteration = opts[Int]("sentences-per-iteration")
     // def step4(iterations: Int, : Int) {
     // Using the ParserDemo.java class as a example, develop a simple command line interface to the LexicalizedParser that includes support for active learning. Your package should train a parser on a given training set and evaluate it on a given test set, as with the bundled LexicalizedParser. Additionally, choose a random set of sentences from the "unlabeled" training pool whose word count totals approximately 1500 (this represents approximately 60 additional sentences of average length). Output the original training set plus the annotated versions of the randomly selected sentences as your next training set. Output the remaining "unlabeled" training instances as your next "unlabeled" training pool. Lastly, collect your results for this iteration, including at a minimum the following:
+
+    def printResults(results: Seq[Map[String, Any]]) {
+      val sep = List.fill(80)("-").mkString
+      println(sep)
+      val columns = List(
+        ("Iteration", "%d"),
+        ("Added training words", "%d"),
+        ("Total training words", "%d"),
+        ("Sample selection method", "%s"),
+        ("PCFG F1 score", "%.5f")
+      )
+      val table = Table(columns, ", ")
+      table.printHeader()
+      for (result <- results)
+        table.printLine(result)
+      println(sep)
+    }
 
     val results = ListBuffer[Map[String, Any]]()
 
@@ -155,13 +182,13 @@ object ActiveLearner {
             // println("sentence: " + sentence.map(_.word).mkString(" "))
             val tree_entropy = if (parserQuery.parse(sentence)) {
               val top_k_parses = parserQuery.getKBestPCFGParses(k)
+              // val top_k_log_probs = top_parses.map(_.score)
               // top_parses(0).score is a log prob, so we exponentiate
               val top_k_probabilities = top_k_parses.map(_.score).map(math.exp)
-              // val top_k_log_probs = top_parses.map(_.score)
               val p_sentence = top_k_probabilities.sum
               val top_k_normalized = top_k_probabilities.map(_/p_sentence)
 
-              top_k_normalized.map { p => p * log2(p) }.sum * -1
+              top_k_normalized.map(p => p * log2(p)).sum * -1
             }
             else {
               Double.PositiveInfinity
@@ -195,21 +222,11 @@ object ActiveLearner {
         "Sample selection method" -> selection_method,
         "PCFG F1 score" -> retrained_parser.parserQuery().testOnTreebank(test)
       )
+
+      printResults(results)
     }
 
-    println(List.fill(80)("=").mkString)
-    val columns = List(
-      ("Iteration", "%d"),
-      ("Added training words", "%d"),
-      ("Total training words", "%d"),
-      ("Sample selection method", "%s"),
-      ("PCFG F1 score", "%.5f")
-    )
-    val table = Table(columns, ", ")
-    table.printHeader()
-    for (result <- results)
-      table.printLine(result)
-
+    println("Finished all iterations")
     // For reference, the TA's code took the following arguments: --trainBank <file>, --candidateBank <file>, --testBank <file>, --nextTrainBank <file>, --nextCandidatePool <file>, --selectionFunction <random|treeEntropy|...>. For each iteration, the first three arguments were files that were read, and the next two were filenames that were written to.
 
   }
