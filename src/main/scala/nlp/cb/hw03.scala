@@ -5,46 +5,52 @@ import scala.util.Random
 import scala.collection.JavaConversions._
 import scala.collection.mutable.ListBuffer
 import java.io.{PrintWriter, OutputStream}
+import org.apache.log4j.{Logger, Level, BasicConfigurator}
 
 import org.rogach.scallop._
 import edu.stanford.nlp.parser.lexparser.{LexicalizedParser, TrainOptions, TestOptions, Options, EnglishTreebankParserParams, TreebankLangParserParams}
-import edu.stanford.nlp.io.{NumberRangeFileFilter, RegExFileFilter}
+import edu.stanford.nlp.io.NumberRangeFileFilter
 import edu.stanford.nlp.trees.{Tree, Treebank, DiskTreebank, MemoryTreebank}
 import edu.stanford.nlp.ling.{HasTag, HasWord, TaggedWord}
 
-class NullOutputStream extends OutputStream {
-  override def write(b: Int) { }
-  override def write(b: Array[Byte]) { }
-  override def write(b: Array[Byte], off: Int, len: Int) { }
-  override def close() { }
-  override def flush() { }
-}
+// class NullOutputStream extends OutputStream {
+//   override def write(b: Int) { }
+//   override def write(b: Array[Byte]) { }
+//   override def write(b: Array[Byte], off: Int, len: Int) { }
+//   override def close() { }
+//   override def flush() { }
+// }
 
-class QuietEnglishTreebankParserParams() extends EnglishTreebankParserParams {
-  override def pw(): PrintWriter = {
-    return new PrintWriter(new NullOutputStream())
-  }
+// class QuietEnglishTreebankParserParams() extends EnglishTreebankParserParams {
+//   override def pw(): PrintWriter = {
+//     return new PrintWriter(new NullOutputStream())
+//   }
 
-  override def pw(o: OutputStream): PrintWriter = {
-    return new PrintWriter(new NullOutputStream())
-  }
+//   override def pw(o: OutputStream): PrintWriter = {
+//     return new PrintWriter(new NullOutputStream())
+//   }
 
-  override def display() { }
-}
+//   override def display() { }
+// }
 
-class QuietTestOptions extends TestOptions {
-  override def display() { }
-}
-class QuietTrainOptions extends TrainOptions {
-  override def display() { }
-}
-class QuietOptions(par: TreebankLangParserParams) extends Options(par) {
-  trainOptions = new QuietTrainOptions()
-  testOptions = new QuietTestOptions()
-  override def display() { }
-}
+// class QuietTestOptions extends TestOptions {
+//   override def display() { }
+// }
+// class QuietTrainOptions extends TrainOptions {
+//   override def display() { }
+// }
+// class QuietOptions(par: TreebankLangParserParams) extends Options(par) {
+//   trainOptions = new QuietTrainOptions()
+//   testOptions = new QuietTestOptions()
+//   override def display() { }
+// }
 
 object ActiveLearner {
+
+  val logger = Logger.getRootLogger()
+  logger.setLevel(Level.DEBUG)
+  BasicConfigurator.configure()
+
   class TreebankWrapper(trees: Seq[Tree]) {
     def toTreebank = {
       val treebank = new MemoryTreebank()
@@ -67,8 +73,8 @@ object ActiveLearner {
 
     val penn = sys.env("PENN")
 
-    val tlp = new QuietEnglishTreebankParserParams()
-    val options = new QuietOptions(tlp)
+    val tlp = new EnglishTreebankParserParams()
+    val options = new Options(tlp)
     options.doDep = false
     options.doPCFG = true
     options.setOptions("-goodPCFG", "-evals", "tsv")
@@ -89,30 +95,31 @@ object ActiveLearner {
     // step3
     // Create an initial training set, an "unlabeled" training pool for active learning, and a test set. To create the initial training set, extract the first 50 sentences from section 00. For the unlabeled training set, concatenate sections 01-03 of WSJ. This will give you roughly 4500 additional potential training sentences (approximately 100,000 words). For testing, use WSJ section 20.
 
+    // Stanford parser is so cool that the only way you can determine whether a single sentence
+    // will break it is by trying to train a parser on a treebank of just that sentence.
+    def isTrainable(tree: Tree): Boolean = {
+      try {
+        LexicalizedParser.trainFromTreebank(List(tree).toTreebank, options)
+        true
+      }
+      catch {
+        // println("Cannot train on sentence: " + tree.yieldWords().map(_.word()).mkString(" "))
+        case e: java.lang.StringIndexOutOfBoundsException => false
+      }
+    }
+
     val wsj_00 = new MemoryTreebank()
     wsj_00.loadPath(penn+"/parsed/mrg/wsj/00")
     wsj_00.textualSummary
     // the Stanford NLP is pretty awesome, because if I don't run the textualSummary, training the parser will break later
     val initial_count = opts[Int]("initial-labeled")
-    println("wsj_00: " + wsj_00.size + " " + initial_count)
-    val initial = wsj_00.toSeq.filter { tree =>
-      // Stanford parser is so cool that the only way you can determine whether a single sentence
-      // will break it is by trying to train a parser on a treebank of just that sentence.
-      try {
-        LexicalizedParser.trainFromTreebank(List(tree).toTreebank, options)
-        true
-      } catch {
-        case e: java.lang.StringIndexOutOfBoundsException =>
-          println("Cannot train on sentence: " + tree.yieldWords().map(_.word()).mkString(" "))
-          false
-      }
-    }.take(initial_count)
+    val initial = wsj_00.toSeq.filter(isTrainable).take(initial_count)
 
-    val unlabeled = new MemoryTreebank()
-    unlabeled.loadPath(penn+"/parsed/mrg/wsj/01")
-    unlabeled.loadPath(penn+"/parsed/mrg/wsj/02")
-    unlabeled.loadPath(penn+"/parsed/mrg/wsj/03")
-    unlabeled.textualSummary
+    val wsj_0123 = new MemoryTreebank()
+    wsj_0123.loadPath(penn+"/parsed/mrg/wsj/01")
+    wsj_0123.loadPath(penn+"/parsed/mrg/wsj/02")
+    wsj_0123.loadPath(penn+"/parsed/mrg/wsj/03")
+    wsj_0123.textualSummary
 
     val test = new MemoryTreebank()
     test.loadPath(penn+"/parsed/mrg/wsj/20")
@@ -145,7 +152,7 @@ object ActiveLearner {
     val results = ListBuffer[Map[String, Any]]()
 
     var next_initial = initial
-    var next_unlabeled = unlabeled.toSeq
+    var next_unlabeled = wsj_0123.toSeq.filter(isTrainable)
 
     val selection_method = opts[String]("selection-method") // "random" "length" "top" "entropy"
     val time_started = System.currentTimeMillis
@@ -204,7 +211,7 @@ object ActiveLearner {
       }
 
       val (unlabeled_selection, unlabeled_remainder) = unlabeled_sorted.splitAt(sentences_per_iteration)
-      // Oh, wait,
+      // Oh, wait, we don't want to use only our own labelings.
       // val unlabeled_selection_reparsed = unlabeled_selection.map { unlabeled_tree =>
       //   parser.apply(unlabeled_tree.yieldHasWord())
       // }
