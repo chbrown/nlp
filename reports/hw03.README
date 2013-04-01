@@ -1,23 +1,33 @@
-
-# prepare ActiveLearnerCommandLine
+# Prepare ActiveLearnerCommandLine
 
 cat $PENN/parsed/mrg/wsj/01/*.mrg > train.0
 cat $PENN/parsed/mrg/wsj/0[123]/*.mrg > candidate.0
-cat $PENN/parsed/mrg/wsj/20/*.mrg > test.0
+cat $PENN/parsed/mrg/wsj/20/*.mrg > test
 
-# run ActiveLearnerCommandLine
+# Run ActiveLearnerCommandLine
 
 IN=0
 NEXT=1
-./sbt run-main "nlp.cb.ActiveLearnerCommandLine --trainBank train.$IN --candidateBank candidate.$IN --testBank test.$IN --nextTrainBank train.$NEXT --nextCandidatePool candidate.$NEXT, --selectionFunction treeEntropy"
+./sbt "run-main nlp.cb.ActiveLearnerCommandLine --trainBank train.$IN --candidateBank candidate.$IN --testBank test --nextTrainBank train.$NEXT --nextCandidatePool candidate.$NEXT --selectionFunction treeEntropy"
 
-# or with iterations tied in:
+Then set
+IN=$NEXT
+NEXT=$[NEXT+1]
+and repeat.
+
+# Or with iterations tied in (more straightforward than a experiment runner `harness'):
 
 You'll need to set an environment variable to tell the parser where your Penn treebank is. On the CS cluster, use:
 
 export PENN=/projects/nlp/penn-treebank3
 
+Start sbt ...
 run-main nlp.cb.ActiveLearner --initial-labeled 50 --iterations 75 --sentences-per-iteration 60 --selection-method random
 run-main nlp.cb.ActiveLearner --initial-labeled 50 --iterations 75 --sentences-per-iteration 60 --selection-method length
 run-main nlp.cb.ActiveLearner --initial-labeled 50 --iterations 75 --sentences-per-iteration 60 --selection-method top
-run-main nlp.cb.ActiveLearner --initial-labeled 50 --iterations 75 --sentences-per-iteration 60 --selection-method entropy
+run-main nlp.cb.ActiveLearner --initial-labeled 50 --iterations 75 --sentences-per-iteration 60 --selection-method treeEntropy
+
+# how to collect results farmed out to Condor using the bin/submit script (only on Github, not included with the homework submission).
+
+for f in $(ls *.out | grep rev); do cat $f | after iteration --last | awk '/------/ { exit } { print }' >> rev.csv; done
+for f in $(ls *.out | grep -v rev); do cat $f | after iteration --last | awk '/------/ { exit } { print }' >> forward.csv; done

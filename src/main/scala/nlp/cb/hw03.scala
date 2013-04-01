@@ -92,7 +92,7 @@ object ActiveLearner {
           // take the n - 1'th root as a way of normalizing
           -math.pow(best_score, 1.0 / (sentence.size - 1))
         }
-      case "entropy" =>
+      case "treeEntropy" =>
         val k = 20
         val tree_entropies = trees.map { unlabeled_tree =>
           val parserQuery = parser.parserQuery()
@@ -123,7 +123,7 @@ object ActiveLearner {
       .opt[Int]("initial-labeled", required=true)
       .opt[Int]("iterations", required=true)
       .opt[Int]("sentences-per-iteration", required=true)
-      .opt[String]("selection-method", required=true) // "random" "length" "top" "entropy"
+      .opt[String]("selection-method", required=true) // "random" "length" "top" "treeEntropy"
       .opt[Boolean]("reverse")
       .verify
 
@@ -263,18 +263,21 @@ object ActiveLearnerCommandLine {
       .opt[String]("nextCandidatePool", required=true)
       // processing options
       .opt[String]("selectionFunction", required=true) // one of random|treeEntropy|top|length
-      .opt[Int]("sentences-per-iteration", required=true)
+      .opt("sentences-per-iteration", default=() => Some(60))
       // .opt[Boolean]("reverse")
       .verify
 
     val train_disk = new DiskTreebank()
     train_disk.loadPath(opts[String]("trainBank"))
-    // wsj_00.textualSummary
+    // train_disk.textualSummary
+
     val candidate_disk = new DiskTreebank()
     candidate_disk.loadPath(opts[String]("candidateBank"))
+    // candidate_disk.textualSummary
 
     val test_disk = new DiskTreebank()
     test_disk.loadPath(opts[String]("testBank"))
+    // test_disk.textualSummary
 
     // val initial = wsj_00.toSeq.filter(isTrainable).take(initial_count)
     // val unlabeled = wsj_0123.toSeq.filter(isTrainable)
@@ -284,14 +287,20 @@ object ActiveLearnerCommandLine {
     // test.textualSummary
 
     val (next_initial, next_unlabeled) = ActiveLearner.iterate(1,
-      opts[Int]("sentences-per-iteration"), opts[String]("selectionFunction"), opts[Boolean]("reverse"),
+      opts[Int]("sentences-per-iteration"), opts[String]("selectionFunction"), false,
       train_disk.toSeq, candidate_disk.toSeq, test_disk)
 
     def writeTrees(filePath: String, trees: Seq[Tree]) {
       val fp = new java.io.File(filePath)
       val writer = new java.io.PrintWriter(fp)
 
-      trees.foreach(_.pennPrint(writer))
+      trees.foreach { tree =>
+        tree.pennPrint(writer)
+        writer.write("\n")
+      }
+
+      writer.flush()
+      writer.close()
     }
 
     writeTrees(opts[String]("nextTrainBank"), next_initial)
