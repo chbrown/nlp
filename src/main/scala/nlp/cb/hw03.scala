@@ -216,7 +216,7 @@ object ActiveLearner {
       else
         unlabeled_sorted
 
-      val (unlabeled_selection, unlabeled_remainder) = unlabeled_sorted.splitAt(sentences_per_iteration)
+      val (unlabeled_selection, unlabeled_remainder) = unlabeled_resorted.splitAt(sentences_per_iteration)
       // Oh, wait, we don't want to use only our own labelings.
       // val unlabeled_selection_reparsed = unlabeled_selection.map { unlabeled_tree =>
       //   parser.apply(unlabeled_tree.yieldHasWord())
