@@ -3,11 +3,31 @@ You'll need to set an environment variable to tell the parser where your Penn tr
 
     export PENN=/projects/nlp/penn-treebank3
 
+
+
+
 run-main nlp.cb.ActiveLearner --initial-labeled 50 --iterations 75 --sentences-per-iteration 60 --selection-method random
 run-main nlp.cb.ActiveLearner --initial-labeled 50 --iterations 75 --sentences-per-iteration 60 --selection-method length
 run-main nlp.cb.ActiveLearner --initial-labeled 50 --iterations 75 --sentences-per-iteration 60 --selection-method top
 run-main nlp.cb.ActiveLearner --initial-labeled 50 --iterations 75 --sentences-per-iteration 60 --selection-method entropy
 
+# running
+submit --id origparse.top.rev 'nlp.cb.ActiveLearner --initial-labeled 50 --iterations 75 --sentences-per-iteration 60 --selection-method entropy'
+submit --id origparse.entropy.rev 'nlp.cb.ActiveLearner --initial-labeled 50 --iterations 75 --sentences-per-iteration 60 --selection-method entropy'
 
-submit
+# to start
 
+submit --id origparse.entropy 'nlp.cb.ActiveLearner --initial-labeled 50 --iterations 75 --sentences-per-iteration 60 --selection-method top'
+submit --id origparse.entropy 'nlp.cb.ActiveLearner --initial-labeled 50 --iterations 75 --sentences-per-iteration 60 --selection-method entropy'
+
+#
+
+submit --id origparse2.rand 'nlp.cb.ActiveLearner --initial-labeled 50 --iterations 75 --sentences-per-iteration 60 --selection-method random'
+submit --id origparse2.length 'nlp.cb.ActiveLearner --initial-labeled 50 --iterations 75 --sentences-per-iteration 60 --selection-method length'
+submit --id origparse2.top 'nlp.cb.ActiveLearner --initial-labeled 50 --iterations 75 --sentences-per-iteration 60 --selection-method top'
+submit --id origparse2.entropy 'nlp.cb.ActiveLearner --initial-labeled 50 --iterations 75 --sentences-per-iteration 60 --selection-method entropy'
+
+submit --id origparse2.rand.rev 'nlp.cb.ActiveLearner --initial-labeled 50 --iterations 75 --sentences-per-iteration 60 --selection-method random --reverse'
+submit --id origparse2.length.rev 'nlp.cb.ActiveLearner --initial-labeled 50 --iterations 75 --sentences-per-iteration 60 --selection-method length --reverse'
+submit --id origparse2.top.rev 'nlp.cb.ActiveLearner --initial-labeled 50 --iterations 75 --sentences-per-iteration 60 --selection-method top --reverse'
+submit --id origparse2.entropy.rev 'nlp.cb.ActiveLearner --initial-labeled 50 --iterations 75 --sentences-per-iteration 60 --selection-method entropy --reverse'

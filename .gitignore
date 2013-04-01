@@ -1,6 +1,7 @@
 .DS_Store
 /target/
 /project/
+*-fig/
 *.log
 *.aux
 *.out
