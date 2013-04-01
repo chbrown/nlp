@@ -1,33 +1,23 @@
 
+# prepare ActiveLearnerCommandLine
+
+cat $PENN/parsed/mrg/wsj/01/*.mrg > train.0
+cat $PENN/parsed/mrg/wsj/0[123]/*.mrg > candidate.0
+cat $PENN/parsed/mrg/wsj/20/*.mrg > test.0
+
+# run ActiveLearnerCommandLine
+
+IN=0
+NEXT=1
+./sbt run-main "nlp.cb.ActiveLearnerCommandLine --trainBank train.$IN --candidateBank candidate.$IN --testBank test.$IN --nextTrainBank train.$NEXT --nextCandidatePool candidate.$NEXT, --selectionFunction treeEntropy"
+
+# or with iterations tied in:
+
 You'll need to set an environment variable to tell the parser where your Penn treebank is. On the CS cluster, use:
 
-    export PENN=/projects/nlp/penn-treebank3
-
-
-
+export PENN=/projects/nlp/penn-treebank3
 
 run-main nlp.cb.ActiveLearner --initial-labeled 50 --iterations 75 --sentences-per-iteration 60 --selection-method random
 run-main nlp.cb.ActiveLearner --initial-labeled 50 --iterations 75 --sentences-per-iteration 60 --selection-method length
 run-main nlp.cb.ActiveLearner --initial-labeled 50 --iterations 75 --sentences-per-iteration 60 --selection-method top
 run-main nlp.cb.ActiveLearner --initial-labeled 50 --iterations 75 --sentences-per-iteration 60 --selection-method entropy
-
-# running
-submit --id origparse.top.rev 'nlp.cb.ActiveLearner --initial-labeled 50 --iterations 75 --sentences-per-iteration 60 --selection-method entropy'
-submit --id origparse.entropy.rev 'nlp.cb.ActiveLearner --initial-labeled 50 --iterations 75 --sentences-per-iteration 60 --selection-method entropy'
-
-# to start
-
-submit --id origparse.entropy 'nlp.cb.ActiveLearner --initial-labeled 50 --iterations 75 --sentences-per-iteration 60 --selection-method top'
-submit --id origparse.entropy 'nlp.cb.ActiveLearner --initial-labeled 50 --iterations 75 --sentences-per-iteration 60 --selection-method entropy'
-
-#
-
-submit --id origparse2.rand 'nlp.cb.ActiveLearner --initial-labeled 50 --iterations 75 --sentences-per-iteration 60 --selection-method random'
-submit --id origparse2.length 'nlp.cb.ActiveLearner --initial-labeled 50 --iterations 75 --sentences-per-iteration 60 --selection-method length'
-submit --id origparse2.top 'nlp.cb.ActiveLearner --initial-labeled 50 --iterations 75 --sentences-per-iteration 60 --selection-method top'
-submit --id origparse2.entropy 'nlp.cb.ActiveLearner --initial-labeled 50 --iterations 75 --sentences-per-iteration 60 --selection-method entropy'
-
-submit --id origparse2.rand.rev 'nlp.cb.ActiveLearner --initial-labeled 50 --iterations 75 --sentences-per-iteration 60 --selection-method random --reverse'
-submit --id origparse2.length.rev 'nlp.cb.ActiveLearner --initial-labeled 50 --iterations 75 --sentences-per-iteration 60 --selection-method length --reverse'
-submit --id origparse2.top.rev 'nlp.cb.ActiveLearner --initial-labeled 50 --iterations 75 --sentences-per-iteration 60 --selection-method top --reverse'
-submit --id origparse2.entropy.rev 'nlp.cb.ActiveLearner --initial-labeled 50 --iterations 75 --sentences-per-iteration 60 --selection-method entropy --reverse'
