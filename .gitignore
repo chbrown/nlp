@@ -2,6 +2,7 @@
 /target/
 /project/
 *-fig/
+*-cache/
 *.log
 *.aux
 *.out

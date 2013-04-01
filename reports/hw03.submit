@@ -1,0 +1,8 @@
+#!/bin/sh
+TARGET_DIR=hw03-submission
+mkdir -p $TARGET_DIR
+cp ../src/main/scala/nlp/cb/hw03.scala hw03.pdf hw03.README $TARGET_DIR
+turnin --submit nclement cs388-hw3 $TARGET_DIR
+
+echo "Submitted! Double-checking results..."
+turnin --list nclement cs388-hw3
