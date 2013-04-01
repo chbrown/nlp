@@ -12,7 +12,8 @@ resolvers ++= Seq(
   "gwtwiki" at "http://gwtwiki.googlecode.com/svn/maven-repository/",
   "repo.codahale.com" at "http://repo.codahale.com",
   "repo.scalanlp.org" at "http://repo.scalanlp.org/repo",
-  "opennlp.sourceforge.net" at "http://opennlp.sourceforge.net/maven2"
+  "opennlp.sourceforge.net" at "http://opennlp.sourceforge.net/maven2",
+  "maven.ontotext.com" at "http://maven.ontotext.com/archiva/repository/public"
 )
 
 libraryDependencies ++= Seq(
