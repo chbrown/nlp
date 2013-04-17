@@ -19,7 +19,7 @@
 \bibliographystyle{plainnat}
 \bibpunct{(}{)}{,}{a}{,}{,}
 
-\title{NLP: Project Proposal}
+\title{NLP Project Proposal: Definiteness}
 \author{Christopher Brown\smallskip\\\href{mailto:chrisbrown@utexas.edu}{chrisbrown@utexas.edu}}
 
 \usepackage{times}
@@ -36,31 +36,45 @@
 \noindent
 Noun phrases occurring in natural language can be described as either definite or indefinite.
 Definiteness is a semantic concept that relates to givenness, familiarity, topicality, and focus.
-It can be denoted by a variety of determiners, the absence of a determiner, or on context.
-This project focuses on the definite markers, \emph{a} and \emph{the}, and inquires what types of models are best at predicting the determiner when it has been deleted.
+It can be denoted by a variety of determiners, the absence of a determiner, or by context.
+This project focuses on the definite markers, \emph{a} and \emph{the}, and investigates what types of models are best at predicting the most suitable determiner when it is not available.
 \end{abstract}
 
 \section{Semantics of definiteness}
 The theoretical semantics of definite noun phrases has an extensive history; we can start with Gottlob Frege and Bertrand Russell and names. Frege said that the meaning of a name (or definite noun phrase) was the object denoted by that description. Russell complicated matters with his ``The King of France is bald'' example, in which ``the King of France'' cannot refer to anything (at least not since 1848). Russell would call this sentence false, despite the description's failure to refer to anything; the failure of the noun phrase propagates out to the failure of the sentence.
 
-Keith Donnellan and P. F. Strawson disagree, claiming that the sentence is neither true nor false. They argue that the definite noun phrase must denote a unique entity, and if this fails, the sentence is simply incoherent.
+Keith Donnellan and P. F. Strawson disagree; they say that referencing is something speakers, not words, do, and that ``the King of France'' is simply unsuccessful.
+Compare ``a King of France is bald,'' which can refer to any (dead) past King of France, and thus have a truth value. Definite noun phrase usually denote a unique entity, and if this fails, the sentence is incoherent. But compare ``After you enter the lobby, take the elevator to the 13th floor,'' which is acceptable even if there is more than one elevator.
 % Donnellan differentiates between attributive and referential uses of definite noun phrases, but that's not important here.
-Compare ``a King of France is bald,'' which can refer to any (dead) past King of France, and thus have a truth value.
+
+This is just the beginning, but it's clear that the difference between definite and indefinite noun phrases involves a number of factors, such as context, real world knowledge, and other pragmatic phenomena. It is an active field of study in linguistics or philosophy of language, but has received very little attention in computational linguistics.
 
 
 \section{Applications}
-There are primarily two scenarios where we need to determine the appropriate definiteness of a noun phrase.
+Here are two scenarios where we need to determine the appropriate definiteness of a noun phrase:
 \begin{enumerate}
   \item \textbf{Generation.} When generating language from a logical structure, we need to know what kind of referential noun phrase to use when representing a certain entity. This is relevant to anaphora generation, but it's simpler; disregarding pronouns for current purposes, if we use a full noun phrase more than once, we need to know when to use an indefinite description and when to use the definite form.
+
   \item \textbf{Translation.} Some languages, most notable Russian, do not have determiners to denote definiteness. When translating between these languages and languages with overt definiteness markers, how do we determine where to insert determiners.
 
-  For example, Google Translate renders each alternation of ``\begin{tabular}{@{}c@{}}A\\The\end{tabular} man bit \begin{tabular}{@{}c@{}}a\\the\end{tabular} dog'' as \foreignlanguage{russian}{Человек укусил собаку.} Translating back into English produces ``A person bitten by a dog.'' I don't know Russian; it may be genuinely ambiguous, and only determinable via context; but I know that translating back into English accurately requires choosing the correct determiners, for which we need a model of definiteness (as well as anaphora / centering).
-
-
+  % ``\begin{tabular}{@{}c@{}}A\\The\end{tabular} man bit \begin{tabular}{@{}c@{}}a\\the\end{tabular} dog''
+  For example, Google Translate renders each of the four alternations of ``A/The man bit a/the dog'' as \foreignlanguage{russian}{Человек укусил собаку.} Translating back into English produces ``A person bitten by a dog.'' I don't know Russian; it may be genuinely ambiguous, and only determinable via context; but I know that translating back into English accurately requires choosing the correct determiners, for which we need a model of definiteness (as well as anaphora / centering).
 \end{enumerate}
 
+\noindent
+There are a few papers on the second of these applications, translation, but they are specific to only a few language pairs \citep{ishikawa:1995, siegel:1996}.
+
 \section{Experiment}
-The basic research question will be to determine what type of language model allows the best prediction of definiteness
+The basic research question will be to determine what type of language models produce the best prediction of definiteness. Because English has determiners, any parsed document is ``labeled'' data. I will simply replace \emph{a} and \emph{the}'s with the placeholder \guillemotleft\textsc{det}\guillemotright, retaining the original token as the label for that token. While this is an artificial evaluation metric, it could be useful in both of the application scenarios. In anaphora generation, each instance has to be filled by either a full noun phrase, either definite or indefinite, or a pronoun. In the noun phrase case, a placeholder would be inserted by a first pass of the language generation model, and then resolved by the anaphora resolution pass. In machine translation, noun phrases translated from a determiner-less language to one with determiners could be padded with a placeholder, which would then be resolved by some post-processing step performed on just the target language.
+
+My project will consist of evaluating different models for predicting the deleted marker; it is not a typical sequence labeling problem, since relatively few of the tokens need to be resolved. But neither is each instance independent of the previous; in fact, a prior mention is presumably a strong indicator that an entity is now in the active context, and subsequent instances should use the definite determiner. The sequence is crucial in a sense of building and maintaining a `center,' which is a common approach when resolving anaphora \citep{grosz:1995, beaver:2000}.
+% brennan:1987
+But with an intelligent set of features, we might achieve sufficient accuracy with a simple logistic regression; given a set of features, evaluate whether the placeholder should be definite or indefinite?
+
+My investigation will also compare feature sets, to determine which are the most efficient at predicting the deleted definiteness markers. Is the parse structure important, or just the surrounding tokens? Position in sentence / document? One presumably useful feature would be to use a cumulative index for each token type in the document---1 for the first instance, 2 for the second, and so on---which might handle the prior mention issue without requiring a sequence model.
+
+
+\bibliography{/Users/chbrown/Dropbox/ut/tex/liography}
 
 \end{document}
 

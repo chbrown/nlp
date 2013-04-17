@@ -1,0 +1,108 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{henrian-basic}
+
+% \usepackage[pdftex]{graphicx}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{hyperref}
+%\usepackage{enumerate}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage[bottom]{footmisc}
+\usepackage{beramono}
+\usepackage{listings}
+\lstset{basicstyle=\ttfamily}
+\usepackage{enumitem}
+
+\usepackage{natbib}
+\bibliographystyle{plainnat}
+\bibpunct{(}{)}{,}{a}{,}{,}
+
+\title{Homework 4: Project-Related Paper Report}
+\author{Christopher Brown\smallskip\\\href{mailto:chrisbrown@utexas.edu}{chrisbrown@utexas.edu}}
+% Due: April 17, 2013, 3:15pm
+
+\usepackage{times}
+\usepackage[T2A,T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[russian,english]{babel}
+
+\newenvironment{itemize*}%
+  {\begin{itemize}%
+    \setlength{\itemsep}{0pt}%
+    \setlength{\parskip}{0pt}}%
+  {\end{itemize}}
+
+\usepackage{titling}
+\setlength{\droptitle}{-4em}
+\begin{document}
+\maketitle
+
+% Due: April 17, 2013, 3:15pm
+
+\setlength{\topsep}{0pt}
+\section{Summary}
+
+\citet{siegel:1996}\footnote{It is an ancient paper, in NLP-years, but there is very little current research on determiners. The methodology may be obsolete, but the issues are still relevant.} addresses the specific problem of Japanese to German machine translation, focusing on Japanese features that do not manifest at the surface level. Japanese morphology does not consistently manifest plural status, and does not exhibit number agreement between nouns and verbs. Japanese plural markers are optional and can only be applied to noun phrases referring to people.
+German determiners like \emph{ein} and \emph{dem} do not align to anything in the source Japanese sentences, but they are required in the German translation.
+
+It's not as easy as post-processing on the target language though, Siegel claims several factors affect the choice of determiners in the German:
+\begin{itemize}[itemsep=0pt,topsep=6pt]
+  \item Japanese surface level
+  \item German lexical restrictions
+  \item Domain / discourse restrictions
+\end{itemize}
+Together, these determine which insertion is most appropriate. Siegel asserts that the general problem is `interlingual,' and must be addressed at the level of translation.
+
+Other approaches have included pre-processing Japanese text for relevant markers, inferring definiteness / number at the source language level.
+Siegel claims this is too shallow. For example, \emph{shain} (staff member) can translate to either \emph{die Mitarbeiter} (the staff-members) or \emph{der Mitarbeiter} (the staff-member), which is `dependent on the domain.'
+She discusses ways to translate the number and definiteness using Prolog transfer rules separate from the content, so that rules regarding number / definiteness are more general than the lexical transfers seen in training.
+
+While Siegel denies that inferring definiteness is inherently either a Japanese problem or a German problem, she claims that inferring gender at the German level is inherently a German problem, despite systematic / typological gender patterns in some languages that exhibit gender on nouns.
+
+Some Japanese nominal phrases contain a determiner (\emph{sono}/\emph{kono}) that translates to \emph{these}, and predictably marks definiteness. Japanese numerals behave normally and are clear indicators of number, when they occur. Siegel proposes a rule that transforms a determiner-led noun phrase without number into a definite German noun phrase, and suggests that similar rules could use other Japanese features, specifically certain adjectives and genitives.
+
+Using a combination of preference rules with defaults, Siegel shows how her approach can handle translating several types of Japanese noun phrases into German.
+
+Siegel's corpus is small; 10 dialogs, which includes a total of 566 noun tokens at the Japanese level. Her transfer rules seem to be derived from observations solely on this corpus---not on any greater familiarity with translating Japanese to German.
+
+
+
+\pagebreak
+\section{Improvements}
+% limitations of this existing work that your final project will address and/or how your own project relates to this existing work by extending or replicating it in some way
+
+Successfully implementing transfer rules for translation requires deep understanding of language, which isn't feasible given current databases and available linguistic infrastructure. Simpler models that use more data are more successful, as most modern machine translation systems demonstrate.
+
+This semantic aspect of translation is an interlingual problem, as Siegel claims. One could argue that all aspects of translation are interlingual, but machine translation techniques ignoring the theoretical complexities often surpass more justified systems.
+All models are wrong, but some are useful; approaches like Siegel's are more `correct,' as far as Prolog-driven models go, but they aren't as useful.
+
+% \subsubsection*{Extensibility}
+
+Siegel's methodology is highly domain specific; not only are the rules she proposes specific to translating from Japanese to German, but even these are tuned for the translated informal conversation corpus that she discusses.
+Many more languages than Japanese lack determiners; many more than German have them. It would be preferable to start with research considering the problem at a more general level. The rules she proposes may have correlates in other language pairs; I don't know how transferable these transfer rules are, but their lexical specificity suggests that even if the rules would be similar for, say, English, they are not general enough to extended across languages automatically.
+
+\subsubsection*{Evaluation}
+
+Siegel does not demonstrate that her transfer rules are better at translating than simpler pre- or post-processing rules. This research is very early in machine translation, before the statistical revolution, but she relies on intuition rather than results.
+
+My project investigates how much can be achieved via non-aligned surface-level models. It is not a translation problem, but one aspect of semantics which has a major application in translation, particularly by improving post-processing of the translation system's output. Comparing this to a baseline, my approach could itself become a baseline for claims like Siegel's, since my approach attacks just one of the three factors that Siegel claims this problem depends on. If her approach does significantly better than the post-processing of my model, that would be substantial support for her claim of interlingual dependence, and justify further research into inferring definiteness placeholders on the source language, so that they can be translated.
+
+
+\subsubsection*{Conclusion}
+
+Siegel doesn't discussing translating German back to Japanese; is it sufficient to simply drop most German determiners and number morphology? If so, are there easy ways to predict which things get dropped? Are there other issues that arise in the interaction between these two systems? Further, I'm curious if Japanese--Russian translation is easier, because those languages both lack determiners.
+
+My project is a cross-section of some of issues raised in \citet{siegel:1996}. Instead of looking at a particular language pair, I'm investigating the recoverability of definiteness markers at the surface level---on the target language, in a translation scenario. This is more general; whereas language pairs are quadratic in the number of languages handled by some translation system and translation between them requires a large number of parallel texts, surface-level post-processing depends only on the target language and does not require the same depth of annotation.
+
+
+
+\bibliography{/Users/chbrown/Dropbox/ut/tex/liography}
+
+\end{document}
+
+Choose a scientific paper from a conference or journal related to your proposed final project. Read the chosen paper and write a short 2 page type-written report. The first page of the report should briefly summarize the paper. The second page should discuss limitations of this existing work that your final project will address and/or how your own project relates to this existing work by extending or replicating it in some way. Each student on a team project should report on a different related paper(s) and turn in their own report. A PDF copy of the report and the chosen paper(s) must be submitted by 3:15pm on the due date. Please use the instructions for turnin found here.
+
+http://www.cs.utexas.edu/~mooney/cs388/hw-instructions.html
