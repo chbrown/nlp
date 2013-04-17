@@ -1,0 +1,5 @@
+#!/bin/sh
+turnin --submit nclement cs388-hw4 hw04.pdf
+
+echo "Submitted! Double-checking results..."
+turnin --list nclement cs388-hw4
