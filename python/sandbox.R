@@ -7,3 +7,6 @@ d$XY = d$X * d$Y
 glm(d$Z ~ d$X + d$Y + d$XY, family=binomial(link = "probit"))
 
 logit
+
+
+

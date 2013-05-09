@@ -236,8 +236,13 @@ I'm investigating the recoverability of definiteness markers at the surface leve
 
 Currently, this system uses POS tags provided with the corpus as features in the training as well as the testing phase. As previously mentioned, determiners are useful features in POS tagging, so this inter-dependence could potentially become a catch-22. However, I think that the difference between \emph{a/an} and \emph{the} should not be too egregious an issue for a POS tagger; I expect that a POS tagger trained on a corpus with anonymized determiners would learn to use the merged placeholder `DET' just as well.
 
-A bigger issue is that \emph{a} and \emph{the} are blindly used as indicators of definiteness.
+A bigger issue is that \emph{a} and \emph{the} are blindly used as indicators of definiteness. While the corpus developed in \citet{vieira:2000} is relatively small, their approach suggests that some measure of definiteness / specificity could be induced from crowdsourced annotations. Active learning could be used to label the less amibiguous determiners (like \emph{the}, \emph{that}), leaving definiteness annotations of more ambiguous determiners and quantifiers (like \emph{a}, \emph{this}, \emph{some}) to human judges.
 
+\section*{Appendix}
+
+Code written to perform the analyses in this project is available at \href{https://github.com/chbrown/nlp}{github.com/chbrown/nlp}.
+This document is licensed \href{http://creativecommons.org/licenses/by/3.0/}{CC BY 3.0}, Copyright 2013 Christopher Brown.
+You are free to distribute this report among the class, should such an effort arise.
 
 \bibliography{/Users/chbrown/Dropbox/ut/tex/liography}
 

@@ -102,6 +102,19 @@ def read_wsj(article_count):
     return articles
 
 
+def matches(xs, ys):
+    '''Returns #same, #different'''
+    assert len(xs) == len(ys), 'Can only perform "matches" on lists of equivalent length'
+    same = 0
+    diff = 0
+    for x, y in zip(xs, ys):
+        if x == y:
+            same += 1
+        else:
+            diff += 1
+    return same, diff
+
+
 # each feature_function goes from a sentence to a list of lists of features to add to the total data for that sentence:
 def ff_def_token(sentence, seen_nouns):
     return [[def_token] for def_token in sentence.def_tokens]
@@ -166,27 +179,9 @@ def preprocess_wsj(article_count, feature_functions):
 
 
 def run_crf(article_count, feature_functions, split=0.9, model_path='crf.model'):
-    '''
-    Returns:
-        total_articles_count (int)
-        total_token_count (int)
-        training_articles_count (int)
-        testing_articles_count (int)
-        confusion_matrix (dict)
-
-    '''
     articles, total_token_count = preprocess_wsj(article_count, feature_functions)
 
     train, test = bifurcate(articles, split, shuffle=True)
-    # print 'Training on %d articles, testing on %d.' % (len(train), len(test))
-
-    # take = 0
-    # print 'First %d articles:' % take
-    # for article in train[:take]:
-    #     print '---'
-    #     for sentence in article:
-    #         print gloss(zip(sentence.def_tokens, sentence.def_tags, sentence.data))
-    #         print
 
     trainer = crf.Trainer()
     for article in train:
@@ -197,15 +192,22 @@ def run_crf(article_count, feature_functions, split=0.9, model_path='crf.model')
     tagger = crf.Tagger(model_path)
 
     # results = defaultdict(list)
-    confusion_matrix = defaultdict(int)
+    # confusion_matrix = defaultdict(int)
+    correct = 0
+    wrong = 0
     for article in test:
         for sentence in article:
-            predicted_tags = tagger.tag_raw(sentence.data)
-            for token, gold, predicted in zip(sentence.tokens, sentence.def_tags, predicted_tags):
-                key = (gold, predicted)
+            gold_labels = sentence.def_tags
+            predicted_labels = tagger.tag_raw(sentence.data)
+            # for token, gold, predicted in zip(sentence.tokens, sentence.def_tags, predicted_tags):
+            for gold, predicted in zip(gold_labels, predicted_labels):
+                # key = (gold, predicted)
                 # results[key] += [token]
-                if gold != predicted:
-                    confusion_matrix['%s->%s' % key] += 1
+                if gold in ('DEF', 'INDEF'):
+                    if gold == predicted:
+                        correct += 1
+                    else:
+                        wrong += 1
 
     # print 'Results'
     # for (predicted_label, gold_label), tokens in results.items():
@@ -213,24 +215,21 @@ def run_crf(article_count, feature_functions, split=0.9, model_path='crf.model')
         # cprint('%5d predicted=%s -> gold=%s' % (len(tokens), predicted_label, gold_label), color)
         # print '  ', Counter(tokens).most_common(20)
 
-    # documents = read_brown(opts.docs)
-    # for sentence in read_wsj():
-    # print 'Total corpus labels:', count_labels(documents)
-    # print 'POS Tags', count_attrs(documents, 'pos_tags')
-    # print 'POS Tags', count_attrs(documents, 'pos_tags')
-
     return dict(
-        total_articles_count=len(articles),
-        total_token_count=total_token_count,
-        training_articles_count=len(train),
-        testing_articles_count=len(test),
-        confusion_matrix=confusion_matrix
+        total_articles_count=len(articles),  # int
+        total_token_count=total_token_count,  # int
+        train_count=len(train),  # int
+        test_count=len(test),  # int
+        kernel='CRF',
+        correct=correct,
+        wrong=wrong,
+        total=correct + wrong
     )
 
 
-def do_svm(article_count, split):
+def run_svm(article_count, feature_functions, kernel='polynomial', split=0.9, model_path='svm.model'):
     # https://bitbucket.org/wcauchois/pysvmlight
-    articles = preprocess_wsj(article_count)
+    articles, total_token_count = preprocess_wsj(article_count, feature_functions)
 
     dictionary = Dictionary()
     dictionary.add_one('ZZZZZ')  # so that no features are labeled 0
@@ -245,16 +244,13 @@ def do_svm(article_count, split):
                     feature_values = zip(features, [1]*len(features))
                     data.append((+1 if tag == 'DEF' else -1, feature_values))
 
-    train, test = bifurcate(data, split)
-
-    print 'Training on %d determiners, testing on %d.' % (len(train), len(test))
+    train, test = bifurcate(data, split, shuffle=True)
 
     # for corpus, name in [(train, 'train'), (test, 'test')]:
         # write_svm(corpus, 'wsj_svm-%s.data' % name)
 
     #####################
     # do svm in Python...
-    kernel = 'polynomial'
     model = svmlight.learn(train, type='classification', kernel=kernel)
 
     # svmlight.learn options
@@ -267,25 +263,28 @@ def do_svm(article_count, split):
     # coef_lin
     # coef_const
     # costratio (corresponds to -j option to svm_learn)
-    svmlight.write_model(model, 'wsjmodel.svm')
+    svmlight.write_model(model, model_path)
 
     gold_labels, test_feature_values = zip(*test)
-    # print 'gold_labels', gold_labels
-    # print 'test_feature_values', test_feature_values
+    # total = len(gold_labels)
 
     test_pairs = [(0, feature_values) for feature_values in test_feature_values]
-    predicted_labels = svmlight.classify(model, test_pairs)
-    # print 'len(predicted_labels), len(gold_labels)', len(predicted_labels), len(gold_labels)
-    print 'gold_labels', Counter(gold_labels)
+    predictions = svmlight.classify(model, test_pairs)
 
-    correct = len([1 for predicted, gold in zip(predicted_labels, gold_labels) if (predicted > 0) == (gold == 1)])
-    wrong = len(gold_labels) - correct
-    # print 'predicted', 'gold'
-    # for predicted, gold in zip(predicted_labels, gold_labels):
-        # print '%.8f (%d)' % (predicted, gold)
+    correct, wrong = matches(
+        [(gold > 0) for gold in gold_labels],
+        [(prediction > 0) for prediction in predictions])
 
-    print 'Correct: %d, Wrong: %d' % (correct, wrong)
-
+    return dict(
+        total_articles_count=len(articles),  # int
+        total_token_count=total_token_count,  # int
+        train_count=len(train),  # int
+        test_count=len(test),  # int
+        kernel=kernel,
+        correct=correct,
+        wrong=wrong,
+        total=correct + wrong,
+    )
 
 
 # successes = 0
@@ -312,16 +311,34 @@ def do_hmm(documents, split):
             # else:
             #     errors[(predicted_label, gold_label)] += [token]
 
+headers = [
+    'model',
+    'kernel',
+    'feature_function',
+    'total_articles_count',
+    'testing_articles_count',
+    'train_count',
+    'total_token_count',
+    'correct',
+    'wrong',
+    'total',
+]
+
+
+def print_tab(xs):
+    print '\t'.join(map(str, xs))
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Detect definites.')
     parser.add_argument('--articles', type=int, default=1000, help='Number of articles to read from corpus')
-    parser.add_argument('--model_path', default='definiteness.model')
+    parser.add_argument('--model_path', default='definiteness-model.bin')
     parser.add_argument('--split', type=float, default=.9, help='Train/test split')
     opts = parser.parse_args()
 
-    # do_crf(opts.articles, opts.model, opts.split)
     # do_svm(opts.articles, opts.split)
-    article_counts = [100, 1000, 10000]
+    # def crf():
+    article_counts = [100, 250, 500, 1000, 2500]
     feature_function_selections = [
         # (name, feature_function_list), pairs
         ('ff_def_na', [ff_def_na]),
@@ -331,12 +348,26 @@ if __name__ == '__main__':
         ('ff_next_noun_with_seen', [ff_def_na, ff_def_token, ff_next_noun, ff_next_noun_seen]),
         ('full', [ff_def_na, ff_def_token, ff_next_def_token, ff_next_noun, ff_next_noun_seen]),
     ]
+    kernels = ['linear', 'polynomial', 'rbf', 'sigmoid']
 
+    print_tab(headers)
+
+    # CRF
+    # for article_count in article_counts:
+    #     for ff_label, feature_functions in feature_function_selections:
+    #         result = run_crf(article_count, feature_functions, split=opts.split, model_path=opts.model_path)
+    #         result['model'] = 'CRF'
+    #         result['feature_function'] = ff_label
+    #         print_tab([result.get(key, 0) for key in headers])
+
+    # SVM
     for article_count in article_counts:
         for ff_label, feature_functions in feature_function_selections:
-            result = run_crf(article_count, feature_functions, split=opts.split, model_path=opts.model_path)
-            result['feature_functions'] = ff_label
-            print json.dumps(result)
+            for kernel in kernels:
+                result = run_svm(article_count, feature_functions, kernel=kernel, split=opts.split, model_path=opts.model_path)
+                result['model'] = 'SVM'
+                result['feature_function'] = ff_label
+                print_tab([result.get(key, 0) for key in headers])
 
 
 
