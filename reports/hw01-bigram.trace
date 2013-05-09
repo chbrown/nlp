@@ -1,0 +1,27 @@
+mooney> java -cp /u/mooney/cs388-code/ nlp.lm.BigramModel /projects/nlp/penn-treebank3/tagged/pos/atis/ 0.1
+# Train Sentences = 519 (# words = 3922) 
+# Test Sentences = 58 (# words = 431)
+Training...
+Perplexity = 9.043192013019798
+Word Perplexity = 10.5919539986291
+Testing...
+Perplexity = 19.341388622483773
+Word Perplexity = 24.053999598153656
+mooney> java -cp /u/mooney/cs388-code/ nlp.lm.BigramModel /projects/nlp/penn-treebank3/tagged/pos/wsj/ 0.1
+# Train Sentences = 43820 (# words = 995626) 
+# Test Sentences = 4869 (# words = 111718)
+Training...
+Perplexity = 74.26799183241482
+Word Perplexity = 88.89008380713945
+Testing...
+Perplexity = 219.71517777445175
+Word Perplexity = 275.1178149885602
+mooney> java -cp /u/mooney/cs388-code/ nlp.lm.BigramModel /projects/nlp/penn-treebank3/tagged/pos/brown/ 0.1
+# Train Sentences = 47207 (# words = 1079440) 
+# Test Sentences = 5245 (# words = 93530)
+Training...
+Perplexity = 93.51927720192262
+Word Perplexity = 113.35954408376686
+Testing...
+Perplexity = 231.30243689356243
+Word Perplexity = 310.66735613437913
