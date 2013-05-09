@@ -287,6 +287,42 @@ def run_svm(article_count, feature_functions, kernel='polynomial', split=0.9, mo
     )
 
 
+def run_baseline(article_count, split=0.9):
+    articles, total_token_count = preprocess_wsj(article_count, [])
+    train, test = bifurcate(articles, split, shuffle=True)
+
+    counts = dict(DEF=0, INDEF=0)
+    for article in train:
+        for sentence in article:
+            for def_tag in sentence.def_tags:
+                # only use def / indef tokens
+                if def_tag in ('DEF', 'INDEF'):
+                    counts[def_tag] += 1
+
+    mle = 'DEF' if counts['DEF'] > counts['INDEF'] else 'INDEF'
+    # print 'Using MLE', mle
+
+    test_det_def_tags = []
+    for article in test:
+        for sentence in article:
+            for def_tag in sentence.def_tags:
+                if def_tag in ('DEF', 'INDEF'):
+                    test_det_def_tags.append(def_tag)
+
+    correct, wrong = matches([mle]*len(test_det_def_tags), test_det_def_tags)
+
+    return dict(
+        total_articles_count=len(articles),  # int
+        total_token_count=total_token_count,  # int
+        train_count=len(train),  # int
+        test_count=len(test),  # int
+        kernel='MLE=%s' % mle,
+        correct=correct,
+        wrong=wrong,
+        total=correct + wrong,
+    )
+
+
 # successes = 0
 # errors = defaultdict(list)
 def do_hmm(documents, split):
@@ -316,8 +352,8 @@ headers = [
     'kernel',
     'feature_function',
     'total_articles_count',
-    'testing_articles_count',
     'train_count',
+    'test_count',
     'total_token_count',
     'correct',
     'wrong',
@@ -351,6 +387,11 @@ if __name__ == '__main__':
     kernels = ['linear', 'polynomial', 'rbf', 'sigmoid']
 
     print_tab(headers)
+    for article_count in article_counts:
+        result = run_baseline(article_count, split=opts.split)
+        result['model'] = 'Baseline'
+        result['feature_function'] = 'MLE'
+        print_tab([result.get(key, 0) for key in headers])
 
     # CRF
     # for article_count in article_counts:
@@ -361,13 +402,13 @@ if __name__ == '__main__':
     #         print_tab([result.get(key, 0) for key in headers])
 
     # SVM
-    for article_count in article_counts:
-        for ff_label, feature_functions in feature_function_selections:
-            for kernel in kernels:
-                result = run_svm(article_count, feature_functions, kernel=kernel, split=opts.split, model_path=opts.model_path)
-                result['model'] = 'SVM'
-                result['feature_function'] = ff_label
-                print_tab([result.get(key, 0) for key in headers])
+    # for article_count in article_counts:
+    #     for ff_label, feature_functions in feature_function_selections:
+    #         for kernel in kernels:
+    #             result = run_svm(article_count, feature_functions, kernel=kernel, split=opts.split, model_path=opts.model_path)
+    #             result['model'] = 'SVM'
+    #             result['feature_function'] = ff_label
+    #             print_tab([result.get(key, 0) for key in headers])
 
 
 
