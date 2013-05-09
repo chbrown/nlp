@@ -5,22 +5,14 @@
 % \usepackage[pdftex]{graphicx}
 \usepackage{amsmath}
 \usepackage{gb5e}
-% \usepackage{amssymb}
-% \usepackage{multirow}
-% \usepackage{url}
 \usepackage{hyperref}
-\usepackage{enumerate}
+% \usepackage{enumerate}
 \usepackage{float}
 \usepackage{booktabs}
 \usepackage[bottom]{footmisc}
-\usepackage{beramono}
+\usepackage[scaled]{beramono}
 \usepackage{listings}
 \lstset{basicstyle=\ttfamily}
-% \usepackage{titling}
-% \setlength{\droptitle}{-4em}
-
-% \DeclareMathOperator*{\argmax}{arg\,max}
-% \setlength\titlebox{5.5cm} % Expanding the titlebox
 
 \usepackage[T2A,T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -147,14 +139,11 @@ These applications are useful to two specific niches of NLP, , and apply only in
 
 
 %% begin.rcode 'draw1eb', cache=TRUE, dependson='1run'
-pKs = dpospois(unlist(res$Ks)[-(1:5)], lambda, log=TRUE)
-loglikelihoods = unlist(res$loglikelihoods)[-(1:5)]
+%pKs = dpospois(unlist(res$Ks)[-(1:5)], lambda, log=TRUE)
+%loglikelihoods = unlist(res$loglikelihoods)[-(1:5)]
 
-plot(exp(pKs + loglikelihoods), type='l',
-     main='p(K | y)', xlab='Iteration', ylab='', log='y')
-
-plot(exp(pKs), type='l',
-     main='p(K)', xlab='Iteration', ylab='', log='y')
+%plot(exp(pKs + loglikelihoods), type='l',
+%     main='p(K | y)', xlab='Iteration', ylab='', log='y')
 %% end.rcode
 
 
@@ -202,63 +191,52 @@ This is just the beginning, but it's clear that the difference between definite 
 
 \section{Related work}
 
-\citet{siegel:1996}\footnote{It is an ancient paper, in NLP-years, but there is very little current research on determiners. The methodology may be obsolete, but the issues are still relevant.} addresses the specific problem of Japanese to German machine translation, focusing on Japanese features that are not manifested at surface level. Japanese morphology does not consistently show plural status, nor does Japanese exhibit number agreement between nouns and verbs. Japanese plural markers are optional and can only be applied to noun phrases referring to people.
-German determiners like \emph{ein} and \emph{dem} do not align to anything in the source Japanese sentences, but they are required in the German translation. Siegel's goal is derive rules for inserting appropriate determiners in the German sentence output.
+\citet{progovac:1995} begins with the radical syntactic change that Abney had recently proposed: that noun phrases are headed by the determiner, not the noun \citep{abney:1987}. She demonstrates, using the position of pronouns and other demonstratives, that Serbian-Croatian (a language without articles like \emph{a/the}) has a determiner position, and that it is usually filled by a null determiner of some definiteness. In S-C, there is a definiteness marker \emph{-i}, which Progovac explains as arising in determiner position, but transferring to the adjective on the surface.
 
-It's not a simple matter of post-processing output in the target language; Siegel claims several factors affect the choice of determiners in the German:
-\begin{itemize}[itemsep=0pt,topsep=6pt]
-  \item Japanese surface level
-  \item German lexical restrictions
-  \item Domain / discourse restrictions
-\end{itemize}
-Together, these determine which insertion is most appropriate. Siegel asserts that the general problem is `interlingual,' and must be addressed at the level of translation.
+\citet{ko:2009} uses L2-acquisition errors to demonstrate definiteness effects via determiner usage. They distinguish `definiteness' and `specificity' by stating that `definiteness' involves common knowledge of uniqueness of referent between speaker and hearer, while `specificity' only involves that uniqueness be known to the speaker. Native Korean and Russian speakers (both article-less languages) demonstrated, via a task very similar to the one described in this paper, that speakers tend to associate two articles, like \emph{a} and \emph{the}, with the value of one of these features, either [$\pm$definite] (correct, for English) or [$\pm$specific] (incorrect). Given some larger context and a placeholder in determiner position, the task is to replace the placeholder with either \emph{the}, \emph{a}, or a blank. While my task does not consider the null determiner option, this experimental design lends credibility to my peculiar and somewhat artificial task.
+
+Similarly, \citet{cho:2011} looks for evidence of a determiner phrase in Russian, in native English learners' acquisition of Russian. Based on patterns of these speakers using certain definiteness-marking adjectives (with `covertly expressed' definite features), she claims that the English grammar of definiteness is readily transferred to definiteness features in Russian.
+
+\citet{vieira:2000} uses a portion of the Penn Treebank containing about $1,400$ definite descriptions, based on annotations gathered from multiple annotations produced by their subject pool (this was partly to determine how easy / reliable the task itself was, which they investigate further in \citet{poesio:1998}). They primarily had the purpose of distinguishing discourse-old and discourse-new descriptions; while they call their system shallow, it uses much more descriptive features than mine, using aspects such as copular constructions, specific predicates, like factives, restrictive / non-restrictive post-modification, appositivity, bridging features and and NER. Their prediction model is a decision tree based on these features, and their F-score on the test data set ($400$ of the $1,400$ descriptions) was $0.69$.
+
+\subsection{Definiteness across translation}
+
+\citet{siegel:1996} addresses the specific problem of Japanese to German machine translation, focusing on Japanese features that are not manifested at surface level.
+German determiners like \emph{ein} and \emph{dem} do not align to anything in the source Japanese sentences, but they are required in the German translation. Siegel derives Prolog transfer rules for inserting appropriate determiners in the German sentence output.
+
+Siegel claims that this process requires more than just post-processing output in the target language, and that several factors affect the choice of determiners in the German. For her, the problem is `interlingual,' and must be addressed at the level of translation.
+However, as most modern translation systems have shown, techniques ignoring theoretical complexities often surpass more linguistically correct systems.
+% To solve these issues at the level of translation is very specialized
+% Siegel's methodology is highly domain specific; not only are the rules she proposes specific to translating from Japanese to German, but even these are tuned for the translated informal conversation corpus that she discusses.
 
 Other approaches have included pre-processing Japanese text for relevant markers, inferring definiteness and number at the source language level.
-Siegel claims this is too shallow. For example, \emph{shain} (staff member) can translate to either \emph{die Mitarbeiter} (the staff-members) or \emph{der Mitarbeiter} (the staff-member), and this is `dependent on the domain.'
-She discusses ways to translate the number and definiteness using Prolog transfer rules separate from the content, so that rules regarding number / definiteness are more general than the lexical transfers seen in just the observed data.
-
-While Siegel denies that inferring definiteness is inherently either a Japanese problem or a German problem, she claims that inferring gender at the German level is inherently a German problem, despite systematic / typological gender patterns in some languages that exhibit gender on nouns.
-
-Some Japanese nominal phrases contain a determiner (\emph{sono}/\emph{kono}) that translates to \emph{these}, and predictably marks definiteness. Japanese numerals behave normally and are clear indicators of number, when they occur. Siegel proposes a rule that transforms a determiner-led noun phrase without number into a definite German noun phrase, and suggests that similar rules could use other Japanese features, specifically certain adjectives and genitives.
-
-Siegel's corpus is small; 10 dialogs, which includes a total of 566 noun tokens at the Japanese level. Her transfer rules seem to be derived from observations solely on this corpus---not on any greater familiarity with translating Japanese to German.
-Using a combination of preference rules with defaults, Siegel shows how an assortment of transfer can handle translating several types of Japanese noun phrases into German, inserting number and definiteness markers that are not given in the Japanese source sentences.
-
-
-
-\pagebreak
-\section{Improvements}
-% limitations of this existing work that your final project will address and/or how your own project relates to this existing work by extending or replicating it in some way
-
-Successfully implementing transfer rules for translation requires deep understanding of language, which isn't feasible given current databases and available linguistic infrastructure. Simpler models that use more data are more successful, as most modern machine translation systems demonstrate.
-
-The semantic issues arising in \citet{siegel:1996} are interlingual problems, as the author claims. One could argue that all aspects of translation are interlingual, but machine translation techniques ignoring the theoretical complexities often surpass more linguistically correct systems.
-All models are wrong, but some are useful; approaches like Siegel's are more `correct,' as far as Prolog-driven models go, but they aren't as useful.
-
-% \subsubsection*{Extensibility}
-
-Siegel's methodology is highly domain specific; not only are the rules she proposes specific to translating from Japanese to German, but even these are tuned for the translated informal conversation corpus that she discusses.
-Many more languages than Japanese lack determiners; many more than German have them. It would be preferable to start with research considering the problem at a more general level. The rules she proposes may have correlates in other language pairs; I don't know how transferable these transfer rules are, but their lexical specificity suggests that even if the rules would be similar for, say, English, they are not general enough to extended across languages automatically.
-
-\subsubsection*{Evaluation}
-
-Siegel does not demonstrate that her transfer rules are better at translating than simpler pre- or post-processing rules. This research is very early in machine translation, before the statistical revolution, but she relies on intuition rather than results.
-
-My project investigates how much can be achieved via non-aligned surface-level models. It is not only a translation problem, but one aspect of semantics which has a major application in translation, particularly by improving post-processing of the translation system's output. Comparing this to a baseline, my approach could itself become a baseline for claims like Siegel's, since I address just one of the three factors that Siegel claims this problem depends on. If her approach does significantly better than the post-processing of my model, that would be substantial support for her claim of interlingual dependence, and justify further research into inferring definiteness placeholders on the source language, so that they can be translated.
+% Siegel claims this is too shallow. For example, \emph{shain} (staff member) can translate to either \emph{die Mitarbeiter} (the staff-members) or \emph{der Mitarbeiter} (the staff-member), and this is `dependent on the domain.'
+Her rules use other definiteness signals in the source language (Japanese), like numerals.
+Using a combination of preference rules with defaults, handles translating several types of Japanese noun phrases into German, inserting number and definiteness markers that are not given in the Japanese source sentences.
+% Many more languages than Japanese lack determiners; many more than German have them. It would be preferable to start with research considering the problem at a more general level. The rules she proposes may have correlates in other language pairs; I don't know how transferable these transfer rules are, but their lexical specificity suggests that even if the rules would be similar for, say, English, they are not general enough to extended across languages automatically.
+% Siegel does not demonstrate that her transfer rules are better at translating than simpler pre- or post-processing rules. This research is very early in machine translation, before the statistical revolution, but she relies on intuition rather than results.
+% My project investigates how much can be achieved via non-aligned surface-level models. It is not only a translation problem, but one aspect of semantics which has a major application in translation, particularly by improving post-processing of the translation system's output. Comparing this to a baseline, my approach could itself become a baseline for claims like Siegel's, since I address just one of the three factors that Siegel claims this problem depends on. If her approach does significantly better than the post-processing of my model, that would be substantial support for her claim of interlingual dependence, and justify further research into inferring definiteness placeholders on the source language, so that they can be translated.
 
 
 \subsubsection*{Conclusion}
 
 Siegel doesn't discuss translating German back to Japanese; is it sufficient to simply drop most German determiners and number morphology? If so, are there easy ways to predict which things get dropped? Are there other issues that arise in the interaction between these two languages? Further, I'm curious if Japanese--Russian translation is easier, because those languages both lack determiners.
 
-My project is a cross-section of some of issues raised in \citet{siegel:1996}. Instead of looking at a particular language pair, I'm investigating the recoverability of definiteness markers at the surface level---on the target language, in a translation scenario. This is more general; whereas language pairs are quadratic in the number of languages handled by the translation system, and translation between them requires a large number of parallel texts, surface-level post-processing depends only on the target language and does not require the same depth of annotation. This means much more data can be put to use, more easily.
+My project is a cross-section of some of issues raised in \citet{siegel:1996}. Instead of looking at a particular language pair,
+
+I'm investigating the recoverability of definiteness markers at the surface level---on the target language, in a translation scenario. This is more general; whereas language pairs are quadratic in the number of languages handled by the translation system, and translation between them requires a large number of parallel texts, surface-level post-processing depends only on the target language and does not require the same depth of annotation. This means much more data can be put to use, more easily.
+
+
+
+
+
 
 
 \section{Limitations and future work}
 
 Currently, this system uses POS tags provided with the corpus as features in the training as well as the testing phase. As previously mentioned, determiners are useful features in POS tagging, so this inter-dependence could potentially become a catch-22. However, I think that the difference between \emph{a/an} and \emph{the} should not be too egregious an issue for a POS tagger; I expect that a POS tagger trained on a corpus with anonymized determiners would learn to use the merged placeholder `DET' just as well.
 
-
+A bigger issue is that \emph{a} and \emph{the} are blindly used as indicators of definiteness.
 
 
 \bibliography{/Users/chbrown/Dropbox/ut/tex/liography}
