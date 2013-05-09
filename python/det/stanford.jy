@@ -1,0 +1,44 @@
+# jython, actually.
+import sys
+
+# import stanford main jar
+sys.path.append('/Users/chbrown/src/stanford-parser-2008-10-26/stanford-parser.jar')
+englishPCFG_path = '/Users/chbrown/src/stanford-parser-2008-10-26/englishPCFG.ser.gz'
+
+# pull in things that we'll need from the stanford parser
+from java.io import CharArrayReader
+from edu.stanford.nlp import *
+
+test = 'One of my favorite features of functional programming languages is that you can treat functions like values.'
+
+
+def parse(sentence):
+    lp = parser.lexparser.LexicalizedParser(englishPCFG_path)
+    lp.setOptionFlags(["-maxLength", "80", "-retainTmpSubcategories"])
+
+    tlp = trees.PennTreebankLanguagePack()
+    tokenizer = tlp.getTokenizerFactory().getTokenizer(CharArrayReader(sentence))
+    tokens = tokenizer.tokenize()
+
+    if lp.parse(tokens):
+        parse = lp.getBestParse()
+
+    gsf = tlp.grammaticalStructureFactory()
+    gs = gsf.newGrammaticalStructure(parse)
+    tdl = gs.typedDependenciesCollapsed()
+
+    print parse.toString()
+    print tdl
+
+# import stanford.nlp.process.PTBTokenizer
+# process.PTBTokenizer
+penn_langpack = trees.PennTreebankLanguagePack()
+penn_tokenizer_factory = penn_langpack.getTokenizerFactory()
+
+
+def tokenize(sentence):
+    reader = CharArrayReader(sentence)
+    # tokenizer = process.PTBTokenizer.newPTBTokenizer(reader)
+    tokenizer = penn_tokenizer_factory.getTokenizer(reader)
+    # tokenizer.tokenize() flattens to an ArrayList of ling.Word's.
+    return tokenizer.tokenize()
