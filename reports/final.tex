@@ -170,6 +170,9 @@ These applications are useful to two specific niches of NLP, , and apply only in
 
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  EXPERIMENT  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Experiment}
 The basic research question will be to determine what type of language models produce the best prediction of definiteness. Because English has determiners, any parsed document is ``labeled'' data. I will simply replace \emph{a} and \emph{the}'s with the placeholder \guillemotleft\textsc{det}\guillemotright, retaining the original token as the label for that token. While this is an artificial evaluation metric, it could be useful in both of the application scenarios. In anaphora generation, each instance has to be filled by either a full noun phrase, either definite or indefinite, or a pronoun. In the noun phrase case, a placeholder would be inserted by a first pass of the language generation model, and then resolved by the anaphora resolution pass. In machine translation, noun phrases translated from a determiner-less language to one with determiners could be padded with a placeholder, which would then be resolved by some post-processing step performed on just the target language.
@@ -179,6 +182,13 @@ My project will consist of evaluating different models for predicting the delete
 But with an intelligent set of features, we might achieve sufficient accuracy with a simple logistic regression; given a set of features, evaluate whether the placeholder should be definite or indefinite?
 
 My investigation will also compare feature sets, to determine which are the most efficient at predicting the deleted definiteness markers. Is the parse structure important, or just the surrounding tokens? Position in sentence / document? One presumably useful feature would be to use a cumulative index for each token type in the document---1 for the first instance, 2 for the second, and so on---which might handle the prior mention issue without requiring a sequence model.
+
+WSJ
+
+2038 articles
+1027820 tokens total.
+77377 determiner tokens,
+
 
 \section{}
 

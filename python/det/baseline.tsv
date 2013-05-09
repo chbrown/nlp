@@ -1,0 +1,6 @@
+model	kernel	feature_function	total_articles_count	train_count	test_count	total_token_count	correct	wrong	total
+Baseline	MLE=DEF	MLE	100	90	10	51388	335	188	523
+Baseline	MLE=DEF	MLE	250	225	25	116233	410	206	616
+Baseline	MLE=DEF	MLE	500	450	50	239415	1126	520	1646
+Baseline	MLE=DEF	MLE	1000	900	100	490024	2787	1359	4146
+Baseline	MLE=DEF	MLE	2028	1825	203	1027820	5431	2430	7861
