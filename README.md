@@ -16,6 +16,14 @@ You're gonna need to install the SBT start-script plugin real quick, first:
 
 
 
+## Serverside hook
+
+In my `~/git/nlp.git/hooks/post-receive` on the server (where I can run job scripts):
+
+    #!/bin/sh
+    cd /u/chbrown/nlp
+    env -i git pull # get rid of GITDIR setting
+    ./sbt stage
 
 
 ## Misc

@@ -84,7 +84,7 @@
 
 
 
-\title{Determining Definiteness from Context}
+\title{Inferring Definiteness from Context}
 \author{Christopher Brown\\
 University of Texas at Austin\\
 \href{mailto:chrisbrown@utexas.edu}{chrisbrown@utexas.edu}}
@@ -105,7 +105,7 @@ University of Texas at Austin\\
 Noun phrases occurring in natural language can be described as either definite or indefinite.
 Definiteness is a semantic concept that relates to givenness, familiarity, topicality, and focus.
 It can be denoted by a variety of determiners, the absence of a determiner, or by context.
-Focusing on the definite markers, \emph{a} and \emph{the}, this paper investigates what types of models are best at predicting the most suitable determiner when it is not available. This inference is useful in natural language generation and some cases of machine translation.
+Focusing on the definiteness markers, \emph{a}/\emph{an} and \emph{the}, this paper investigates what types of models are best at predicting the most suitable determiner when it is not available. This inference is useful in natural language generation and some cases of machine translation.
 \end{abstract}
 
 
@@ -117,12 +117,12 @@ Definiteness is an attribute of a noun phrase that describes the nature of its i
 \begin{exe}
   \ex \textbf{A dog} was barking all night. \label{dog:a}
   \ex \textbf{Dogs} were barking all night. \label{dog:plural}
-  \ex \textbf{This dog} was barking all night. \label{dog:this}
+  \ex \textbf{This dog} was barking all night.\footnote{Excluding the deictic sense of \emph{this}.} \label{dog:this}
   \ex \textbf{The dog} was barking all night. \label{dog:the}
 \end{exe}
-In each case, the bold noun phrase picks out a different set of dogs or implies something different about which dog the speaker means to refer to. \eqref{dog:a} is the least definite; \eqref{dog:plural} is similar, but allows the dogs to take shifts; \eqref{dog:this} suggests the speaker has some way of uniquely identifying the dog, but the hearer would not know which dog without more information; \eqref{dog:the} requires both hearer and speaker to know which dog is referred to.
+In each case, the bold noun phrase picks out a different set of dogs or implies something different about which dog the speaker means to refer to. \eqref{dog:a} is indefinite; \eqref{dog:plural} is similar, but allows the dogs to take shifts; \eqref{dog:this} suggests the speaker has some way of uniquely identifying the dog, but the hearer would not know which dog without more information; \eqref{dog:the} requires both hearer and speaker to know which dog is referred to.
 
-Definiteness is generally defined as the form of noun phrase that is acceptable when the uniqueness of referent is known by both speaker and hearer. Specificity differs in that the hearer may not be aware of this uniqueness. Thus \eqref{dog:this} is specific, but not definite.
+Definiteness is generally defined as the form of noun phrase that is acceptable when the uniqueness of the referent is known by both speaker and hearer. Specificity differs in that the hearer may not be aware of this uniqueness. Thus \eqref{dog:this} is specific, but not definite; \eqref{dog:the} is definite.
 
 In English, determiners are the primary overt markers of definiteness / indefiniteness.
 Definiteness is not completely specified by determiners, though; some uses of \emph{a} can be definite (``A man just proposed to me in the orangery.''\footnote{Fodor and Sag, `Referential and Quantificational Indefinites', \emph{Linguistics and Philosophy} 5. 1982.}); \emph{the} can be indefinite (``After entering the lobby, take the elevator to your left''---even though there may be multiple elevators), while \emph{this} and bare plurals are much more ambiguous. There is a wide variety of other determiners and quantifiers, as well as most pronouns, which mark definiteness in some way.
@@ -149,18 +149,21 @@ Determiners are very common in the English language (Table \ref{tab:browncounts}
   \caption{Brown corpus counts and proportions of selected definiteness markers (in bold).}
   \label{tab:browncounts}
 \end{table}
+
 Many studies of definiteness approach the problem via language acquisition; misuse of determiners by learners of languages with definite-marking articles are observed to demonstrate significant patterns, which I discuss later in the section devoted to related work.
 
 \subsection{Simplifying the problem}
-I could not find any large corpora annotated for definiteness; \citet{calhoun:2010} describes a corpus where `Information Status' is encoded, but not specifically definiteness. \citet{vieira:2000} developed a corpus of about $1,400$ noun phrases annotated with definiteness, but this is relatively small, and the available annotations are relatively deep. I am unaware of any attempts to model definiteness computationally; definiteness is discussed at length in linguistic literature, but its limited usefulness in popular NLP tasks has left it without much empirical / computational attention.
+I could not find any large corpora annotated for definiteness; \citet{calhoun:2010} describes a corpus where `Information Status' is encoded, but not specifically definiteness. \citet{vieira:2000} developed a corpus of about 1,400 noun phrases annotated with definiteness, but this is relatively small, and the available annotations are relatively deep. I am unaware of any attempts to model definiteness computationally; definiteness is discussed at length in linguistic literature, but its limited usefulness in popular NLP tasks has left it without much empirical / computational attention.
 
-Definiteness effects overlap with other semantic features, particularly presupposition and the scope of context. As with many linguistic aspects of semantics / pragmatics, a complete solution would require a much fuller understanding of language than any current NLP system provides.
+Definiteness effects overlap with other semantic features, particularly presupposition and the scope of context. As with many linguistic aspects of semantics and pragmatics, a complete solution would require a much fuller understanding of language than any current NLP system provides.
 
-In many cases, definiteness is clear from the determiner, as with \emph{a} and \emph{the}. Noun phrases with \emph{a} (and \emph{an}) are predominantly indefinite, and those with \emph{the} are always definite. The analysis described in this paper assumes that these particular determiners cover enough cases to serve as a significant portion of the problem, and that \emph{a}/\emph{an} always denote indefiniteness, and \emph{the} always denotes definiteness. The naive baseline accuracy starts pretty high: $69.1\%$---from a maximum likelihood estimate which simply uses the more common of the two markers (\emph{the}).
+In many cases, definiteness is clear from the determiner, as with \emph{a} and \emph{the}. Noun phrases with \emph{a} (and \emph{an}) are predominantly indefinite, and those with \emph{the} are almost always definite. The analysis described in this paper assumes that these particular determiners cover enough cases to serve as a significant portion of the problem, and that \emph{a}/\emph{an} always denote indefiniteness, and \emph{the} always denotes definiteness. The naive baseline starts relatively high; a maximum likelihood estimate using the more common of the two markers (\emph{the}) produces an accuracy of 69.1\%.
 
-This paper demonstrates an approach that achieves up to $79.9\%$ accuracy using SVM (support vector machines) and a small selection of well-motivated, intuitive features.
-I show that it's possible to recover information about definiteness from nearby nouns and similarly shallow features. I do this by replacing all determiners \emph{a}, \emph{an}, and \emph{the} with a special placeholder token, using the original form as the gold label (only distinguishing definite from indefinite). Additionally, I compare results of CRF (Conditional Random Field) sequence labeling against a SVM (Support Vector Machine) tagging each token alone.
-This is primarily a feature selection problem, and I focus on results comparing different subsets of features.
+This paper demonstrates an approach that achieves up to 79.9\% accuracy using SVM (support vector machines) and a small selection of well-motivated, intuitive features.
+I show that it's possible to recover information about definiteness from nearby nouns and similarly shallow features. I do this by replacing all determiners \emph{a}, \emph{an}, and \emph{the} with a special placeholder token, using the original form as the gold label (only distinguishing definite from indefinite).
+
+I compare results of CRF (Conditional Random Field) sequence labeling against a SVM (Support Vector Machine) tagging each token alone.
+And, as this is primarily a feature selection problem, and I look at results comparing different subsets of features.
 
 
 
@@ -189,16 +192,16 @@ Definiteness is just one part of anaphora generation, and this paper tackles onl
 
 \subsection{Machine translation}
 
-Some languages, like Russian and Korean, do not have determiners to denote definiteness; others, like Japanese and Hindi, have a few articles that convey some semantic level of indefiniteness, usually, or are used for other special purposes (such as to denote humans). % that's what the Japanese is doing, right?
-When translating between these languages and languages with overt definiteness markers, we must insert determiners that often have no parallel marker in the source text.
-There are a few papers discussing this particular in machine translation, but they are specific to only a few language pairs \citep{ishikawa:1995, siegel:1996}.
+Some languages, like Russian and Korean, do not have determiners to denote definiteness; others, like Japanese and Hindi, have a few articles that convey some level of indefiniteness, or are used for other special purposes (such as to denote humans). % that's what the Japanese is doing, right?
+When translating from these languages to languages with overt definiteness markers, we must insert determiners that often have no parallel marker in the source text.
+There are a few papers discussing this particular problem in machine translation, but they are specific to only a few language pairs \citep{ishikawa:1995, siegel:1996}.
 
 For example, Google Translate renders each of the four alternations of ``A/The man bit a/the dog'' as \foreignlanguage{russian}{Человек укусил собаку.} Translating back into English produces ``A person bitten by a dog.'' Some Russian adjectives mark definiteness, but otherwise, it must be inferred from context or left ambiguous. But translating from Russian into English requires choosing appropriate determiners, for which we need a model of definiteness (in conjunction with a model of anaphora or centering).
 
-\smallskip
+\subsection{Other treatment}
 These applications are useful to two specific niches of NLP, and apply only in some cases of those areas,
 which may explain why so little computational work exists on the subject.
-The linguistic and philosophical literature on definiteness is much more developed, and will be discussed later.
+The linguistic and philosophical literature on definiteness is much more developed, but most of the approaches from that area require deep understanding of language. This treatment is outside the scope of this paper, as I focus on shallow features.
 
 
 
@@ -217,7 +220,7 @@ The linguistic and philosophical literature on definiteness is much more develop
 \section{Experiment}
 % The basic research question will be to determine what type of language models produce the best prediction of definiteness.
 Because English has determiners, every document is `labeled' data. However, because I want to use features deeper than simple surface tokens, I use the WSJ portion of the Penn Treebank (see Table \ref{tab:wsjoverview}).
-\begin{table}
+\begin{table}[H]
   \centering
   \begin{tabular}{r@{$\;\,$}l}
     2,038 & articles \\
@@ -228,7 +231,7 @@ Because English has determiners, every document is `labeled' data. However, beca
   \label{tab:wsjoverview}
 \end{table}
 \newcommand\detplaceholder{\guillemotleft\textsc{det}\guillemotright}
-To test definiteness inference, I simply replace \emph{a(n)} and \emph{the}'s with the placeholder \detplaceholder{}, while retaining the original token as the label for that token (collapsing \emph{a} and \emph{an} into one representation). While this is an artificial evaluation metric, it could be useful in both of the application scenarios.
+To test definiteness inference, I simply replace \emph{a(n)} and \emph{the} with the placeholder \detplaceholder{}, while retaining the original token as the label for that token (collapsing \emph{a} and \emph{an} into one representation). While this is an artificial evaluation metric, it could be useful in both of the application scenarios.
 
 In the language generation case, a noun phrase would surface with a placeholder inserted in determiner position, which could then be resolved by the approach in this paper, using nearby features to infer definiteness. Similarly, in machine translation, noun phrases translated from a determiner-less language to one with determiners could be padded with a placeholder, which would then be resolved by this post-processing step performed on just the target language.
 
@@ -242,8 +245,10 @@ Here are the features that I use, along with the names describing them in the gr
   \item[next noun seen] Whether or not the `next noun' occurs earlier in the article.
 \end{description}
 
-This is not a typical sequence labeling problem, since relatively few of the tokens need to be resolved. Most of the sequential aspect of anaphors and shifting context is handled by the preprocessing step. However, I compare using an SVM\footnote{SVM$^{light}$ \citep{joachims:1999} via \href{https://bitbucket.org/wcauchois/pysvmlight}{PySVMLight}.} to using a CRF\footnote{CRFSuite \citep{CRFsuite}.}.
-Each instance of definiteness is not independent of the previous---in fact, a prior mention is a strong indicator that an entity is now in the active context, and that subsequent instances should use the definite determiner. The sequence is crucial in a sense of building and maintaining a `center,' which is a common approach when resolving anaphora.
+This is not a typical sequence labeling problem, since relatively few of the tokens need to be resolved.
+But each instance of definiteness is not independent of the previous---in fact, a prior mention is a strong indicator that an entity is now in the active context, and that subsequent instances should use the definite determiner. The sequence is crucial in a sense of building and maintaining a `center,' which is a common approach when resolving anaphora.
+
+Most of this sequential aspect of anaphora and shifting context is handled by the preprocessing step. However, I compare using an SVM\footnote{SVM$^{light}$ \citep{joachims:1999} via \href{https://bitbucket.org/wcauchois/pysvmlight}{PySVMLight}. I also tried LaSVM, but results were little better than the baseline.} to using a CRF.\footnote{CRFSuite \citep{CRFsuite}.}
 % But with an intelligent set of features, we might achieve sufficient accuracy with a simple logistic regression; given a set of features, evaluate whether the placeholder should be definite or indefinite?
 In addition to the learning method, I also compare feature sets, to determine which are the most efficient at predicting the deleted definiteness markers.
 
@@ -251,7 +256,7 @@ In addition to the learning method, I also compare feature sets, to determine wh
 
 In each of the figures below, I have drawn the baseline as a horizontal line at 69.1\% for simplicity; realistically, it would vary slightly across different cross-fold validation samples of the corpus.
 
-I have sampled results for each of the following total counts of articles: 100, 250, 500, 1000, 2038 (the maximum). Each result reported is for a random shuffling of articles (in the CRF case) or tokens (in the SVM case), using a train/test split of 90\%/10\%.
+I have sampled results for each of the following total counts of articles: 100, 250, 500, 1000, 2038 (the maximum). Each result reported is for a random shuffling of articles (in the CRF case) or tokens (in the SVM case), using a train / test split of 90\% / 10\%.
 
 The legend in each plot describes different subsets of my feature functions. Most of these follow a pattern of incremental inclusion of features, see Figure \ref{fig:features} for the full hierarchy (each node includes all of its parents' features).
 
@@ -275,8 +280,9 @@ The legend in each plot describes different subsets of my feature functions. Mos
   \caption{Hierarchy of inclusion of features in experimental feature sets.}\label{fig:features}
 \end{figure}
 
-SVM results use a polynomial kernel. The first plot below shows that a polynomial kernel consistently performs better than alternative kernels; the accuracy lines depict results using the full feature set.
+SVM results use a polynomial kernel. The first plot below shows that a polynomial kernel consistently performs better than alternative kernels; the accuracy lines depict results using the full feature set (see Figure \ref{fig:svmkernel}).
 
+\begin{figure}
 \begin{knitrout}\small
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
@@ -288,9 +294,12 @@ SVM results use a polynomial kernel. The first plot below shows that a polynomia
 
 \end{knitrout}
 
+  \caption{Comparison of SVM kernels.}\label{fig:svmkernel}
+\end{figure}
 
-The full feature set consistently performs the highest. Differences between the next token and the next noun (which are often equivalent) are small; this is somewhat surprising, the next token is an easier metric but seems to do just as well or better. Searching the text of the article for the previous occurrences of the target noun does not seem to add any significant gain.
+The full feature set consistently performs the highest (see Figure \ref{fig:svmffs}). Differences between the next token and the next noun (which are often equivalent) are small; this is somewhat surprising, the next token is an easier metric but seems to do just as well or better. Searching the text of the article for the previous occurrences of the target noun does not seem to add any significant gain.
 
+\begin{figure}
 \begin{knitrout}\small
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
@@ -302,10 +311,14 @@ The full feature set consistently performs the highest. Differences between the 
 
 \end{knitrout}
 
+  \caption{Comparison of feature sets for SVM.}\label{fig:svmffs}
+\end{figure}
 
-The CRF offered no benefit, though we see mostly the same pattern in trade-offs between more complex features sets.
+
+The CRF offered no benefit, though we see mostly the same pattern in trade-offs between more complex features sets (see Figure \ref{fig:crfffs}).
 The SVM seems better suited to the problem, and its results are a few percentage points higher, on average.
 
+\begin{figure}
 \begin{knitrout}\small
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 
@@ -317,6 +330,8 @@ The SVM seems better suited to the problem, and its results are a few percentage
 
 \end{knitrout}
 
+  \caption{Comparison of feature sets for CRF.}\label{fig:crfffs}
+\end{figure}
 
 Notably, though, the CRF and the SVM ran in comparable time, despite the CRF also providing vacuous tags for all non-\detplaceholder{} tokens.
 
@@ -336,13 +351,13 @@ These results demonstrate that it is relatively simple to increase accurate infe
 
 \section{Related work}
 
-\citet{progovac:1995} begins with the radical syntactic change that Abney had recently proposed: that noun phrases are headed by the determiner, not the noun \citep{abney:1987}. She demonstrates, using the position of pronouns and other demonstratives, that Serbian-Croatian (a language without articles like \emph{a/the}) has a determiner position, and that it is usually filled by a null determiner of some definiteness. In S-C, there is a definiteness marker \emph{-i}, which Progovac explains as arising in determiner position, but transferring to the adjective on the surface.
+\citet{progovac:1995} begins with the radical syntactic change that \citet{abney:1987} had recently proposed: that noun phrases are headed by the determiner, not the noun. She demonstrates, using the position of pronouns and other demonstratives, that Serbian-Croatian (a language without articles like \emph{a/the}) has a determiner position, and that it is usually filled by a null determiner of some definiteness. In Serbian-Croatian, there is a definiteness marker \emph{-i}, which Progovac explains as arising in determiner position, but transferring to the adjective on the surface.
 
 \citet{ko:2009} uses L2-acquisition errors to demonstrate definiteness effects via determiner usage. They distinguish `definiteness' and `specificity' by stating that `definiteness' involves common knowledge of uniqueness of referent between speaker and hearer, while `specificity' only involves that uniqueness be known to the speaker. Native Korean and Russian speakers (both article-less languages) demonstrated, via a task very similar to the one described in this paper, that speakers tend to associate two articles, like \emph{a} and \emph{the}, with the value of one of these features, either [$\pm$definite] (correct, for English) or [$\pm$specific] (incorrect). Given some larger context and a placeholder in determiner position, the task is to replace the placeholder with either \emph{the}, \emph{a}, or a blank. While my task does not consider the null determiner option, this experimental design lends credibility to my peculiar and somewhat artificial task.
 
 Similarly, \citet{cho:2011} looks for evidence of a determiner phrase in Russian, in native English learners' acquisition of Russian. Based on patterns of these speakers using certain definiteness-marking adjectives (with `covertly expressed' definite features), she claims that the English grammar of definiteness is readily transferred to definiteness features in Russian.
 
-\citet{vieira:2000} uses a portion of the Penn Treebank containing about $1,400$ definite descriptions, based on annotations gathered from multiple annotations produced by their subject pool (this was partly to determine how easy / reliable the task itself was, which they investigate further in \citet{poesio:1998}). They primarily had the purpose of distinguishing discourse-old and discourse-new descriptions; while they call their system shallow, it uses much more descriptive features than mine, using aspects such as copular constructions, specific predicates, like factives, restrictive / non-restrictive post-modification, appositivity, bridging features and and NER. Their prediction model is a decision tree based on these features, and their F-score on the test data set ($400$ of the $1,400$ descriptions) was $0.69$.
+\citet{vieira:2000} uses a portion of the Penn Treebank containing about 1,400 definite descriptions, based on annotations gathered from multiple annotations produced by their subject pool (this was partly to determine how easy / reliable the task itself was, which they investigate further in \citet{poesio:1998}). They primarily had the purpose of distinguishing discourse-old and discourse-new descriptions; while they call their system shallow, it uses much more descriptive features than mine, using aspects such as copular constructions, specific predicates, like factives, restrictive / non-restrictive post-modification, appositivity, bridging features and and NER. Their prediction model is a decision tree based on these features, and their F-score on the test data set (400 of the 1,400 descriptions) was 0.69.
 
 \subsection{Definiteness across translation}
 
@@ -364,14 +379,14 @@ However, as most modern translation systems have shown, techniques ignoring theo
 % I'm investigating the recoverability of definiteness markers at the surface level---on the target language, in a translation scenario. This is more general; whereas language pairs are quadratic in the number of languages handled by the translation system, and translation between them requires a large number of parallel texts, surface-level post-processing depends only on the target language and does not require the same depth of annotation. This means much more data can be put to use, more easily.
 
 \section{Limitations and future work}
-Currently, this system uses POS tags provided with the corpus as features in the training as well as the testing phase. As previously mentioned, determiners are useful features in POS tagging, so this inter-dependence could potentially become a catch-22. However, I think that the difference between \emph{a/an} and \emph{the} should not be too egregious an issue for a POS tagger; I expect that a POS tagger trained on a corpus with anonymized determiners would learn to use the merged placeholder `DET' just as well.
+Currently, this system uses POS tags provided with the corpus as features in the training as well as the testing phase. As previously mentioned, determiners are useful features in POS tagging, so this inter-dependence could potentially become a catch-22. However, I think that the difference between \emph{a}/\emph{an} and \emph{the} should not be too egregious an issue for a POS tagger; I expect that a POS tagger trained on a corpus with anonymized determiners would learn to use the merged placeholder \detplaceholder{} just as well.
 
-A bigger issue is that \emph{a} and \emph{the} are blindly used as indicators of definiteness. While the corpus developed in \citet{vieira:2000} is relatively small, their approach suggests that some measure of definiteness / specificity could be induced from crowdsourced annotations. Active learning could be used to label the less amibiguous determiners (like \emph{the}, \emph{that}), leaving definiteness annotations of more ambiguous determiners and quantifiers (like \emph{a}, \emph{this}, \emph{some}) to human judges.
+A bigger issue is that \emph{a} and \emph{the} are blindly used as indicators of definiteness. While the corpus developed in \citet{vieira:2000} is relatively small, their approach suggests that some measure of definiteness / specificity could be induced from crowd-sourced annotations. Active learning could be used to label the less ambiguous determiners (like \emph{the}, \emph{that}), leaving definiteness annotations of more ambiguous determiners and quantifiers (like \emph{a}, \emph{this}, \emph{some}) to human judges.
 
 \section{Conclusion}
-For this task of collapsing \emph{a/an} and \emph{the} into a single token and then predicting the original identity, I have shown that an SVM (or CRF) can significantly improve upon the baseline by using a small and simple set of features. This approach is promising as part of the foundation of a larger language generation system, though such a system's requirements span far wider than the narrow issue developed here. However, I think that more linguistically justifiable approaches to problems can offer improvements to current solutions, even if the methodology is much more simple than its theoretical basis.
+For this task of collapsing \emph{a}/\emph{an} and \emph{the} into a single token and then predicting the original identity, I have shown that an SVM (or CRF) can significantly improve upon the baseline by using a small and simple set of features. This approach is promising as part of the foundation of a larger language generation system, though such a system's requirements span far wider than the narrow issue developed here. However, I think that more linguistically justifiable approaches to problems can offer improvements to current solutions, even if the methodology is much more simple than its theoretical basis.
 
-Implementing this, or some part of this approach, in a language generation system will be a much more accurate test of its worth, but I believe that any improvement in making generated language more natural sounding is worthwhile. This paper shows that some aspect of definiteness is encoded in very simple features, which, if factored into the generation process, will help to determine what style of noun phrase is most appropriate.
+Implementing this, or some part of this approach, in a language generation system will be a much more accurate test of its worth, but I believe that any improvement in making generated language sound more natural is worthwhile. This paper shows that some aspect of definiteness is encoded in very simple features, which, if factored into the generation process, will help to determine what type of noun phrase is most appropriate.
 
 
 
@@ -384,10 +399,6 @@ This document is licensed \href{http://creativecommons.org/licenses/by/3.0/}{CC 
 \bibliography{/Users/chbrown/Dropbox/ut/tex/liography}
 
 \end{document}
-
-
-
-
 
 
 # SVMs
@@ -407,9 +418,8 @@ scikit-learn
 
 Matrix decomposition in Java: http://code.google.com/p/decomposer/
 
-LaSVM:
-la test
-loading model: 49246 svs
-examples: 7738   features: 13268
-accuracy= 69.2815 (5361/7738)
-
+% LaSVM:
+% la test
+% loading model: 49246 svs
+% examples: 7738   features: 13268
+% accuracy= 69.2815 (5361/7738)

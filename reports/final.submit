@@ -1,0 +1,5 @@
+#!/bin/sh
+turnin --submit nclement cs388-project final.pdf
+
+echo "Submitted! Double-checking results..."
+turnin --list nclement cs388-project
