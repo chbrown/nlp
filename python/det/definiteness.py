@@ -372,9 +372,8 @@ if __name__ == '__main__':
     parser.add_argument('--split', type=float, default=.9, help='Train/test split')
     opts = parser.parse_args()
 
-    # do_svm(opts.articles, opts.split)
-    # def crf():
-    article_counts = [100, 250, 500, 1000, 2500]
+    # article_counts = [100, 250, 500, 1000, 2500]
+    article_counts = [2500]
     feature_function_selections = [
         # (name, feature_function_list), pairs
         ('ff_def_na', [ff_def_na]),
@@ -387,6 +386,8 @@ if __name__ == '__main__':
     kernels = ['linear', 'polynomial', 'rbf', 'sigmoid']
 
     print_tab(headers)
+
+    # BASELINE
     for article_count in article_counts:
         result = run_baseline(article_count, split=opts.split)
         result['model'] = 'Baseline'
@@ -394,21 +395,21 @@ if __name__ == '__main__':
         print_tab([result.get(key, 0) for key in headers])
 
     # CRF
-    # for article_count in article_counts:
-    #     for ff_label, feature_functions in feature_function_selections:
-    #         result = run_crf(article_count, feature_functions, split=opts.split, model_path=opts.model_path)
-    #         result['model'] = 'CRF'
-    #         result['feature_function'] = ff_label
-    #         print_tab([result.get(key, 0) for key in headers])
+    for article_count in article_counts:
+        for ff_label, feature_functions in feature_function_selections:
+            result = run_crf(article_count, feature_functions, split=opts.split, model_path=opts.model_path)
+            result['model'] = 'CRF'
+            result['feature_function'] = ff_label
+            print_tab([result.get(key, 0) for key in headers])
 
     # SVM
-    # for article_count in article_counts:
-    #     for ff_label, feature_functions in feature_function_selections:
-    #         for kernel in kernels:
-    #             result = run_svm(article_count, feature_functions, kernel=kernel, split=opts.split, model_path=opts.model_path)
-    #             result['model'] = 'SVM'
-    #             result['feature_function'] = ff_label
-    #             print_tab([result.get(key, 0) for key in headers])
+    for article_count in article_counts:
+        for ff_label, feature_functions in feature_function_selections:
+            for kernel in kernels:
+                result = run_svm(article_count, feature_functions, kernel=kernel, split=opts.split, model_path=opts.model_path)
+                result['model'] = 'SVM'
+                result['feature_function'] = ff_label
+                print_tab([result.get(key, 0) for key in headers])
 
 
 

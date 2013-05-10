@@ -5,6 +5,7 @@
 % \usepackage[pdftex]{graphicx}
 \usepackage{amsmath}
 \usepackage{gb5e}
+\usepackage{tikz-qtree}
 \usepackage{hyperref}
 % \usepackage{enumerate}
 \usepackage{float}
@@ -24,8 +25,9 @@
 
 \newcommand{\rinline}[1]{SOMETHING WRONG WITH knitr}
 %% begin.rcode setup, include=FALSE
-%opts_chunk$set(fig.path='figures/latex-', cache.path='cache/latex-', echo=FALSE,
-%  fig.align='center', fig.width=8, fig.height=5, out.width='0.9\\linewidth', size='small')#$
+opts_chunk$set(fig.path='knitr-fig/latex-', cache.path='knitr-cache/latex-', echo=FALSE,
+  fig.align='center', fig.width=8, fig.height=5, out.width='\\linewidth', size='small')#$
+library(ggplot2)
 %% end.rcode
 
 \title{Determining Definiteness from Context}
@@ -100,9 +102,14 @@ I could not find any large corpora annotated for definiteness; \citet{calhoun:20
 
 Definiteness effects overlap with other semantic features, particularly presupposition and the scope of context. As with many linguistic aspects of semantics / pragmatics, a complete solution would require a much fuller understanding of language than any current NLP system provides.
 
-In many cases, definiteness is clear from the determiner, as with \emph{a} and \emph{the}. Noun phrases with \emph{a} (and \emph{an}) are predominantly indefinite, and those with \emph{the} are always definite. The analysis described in this paper assumes that these particular determiners cover enough cases to serve as a significant portion of the problem, and that \emph{a}/\emph{an} always denote indefiniteness, and \emph{the} always denotes definiteness. The naive baseline accuracy starts pretty high: $69.1\%$---from a maximum likelihood estimate which simply uses the more common of the two markers (\emph{the}). This paper demonstrates an approach that achieves up to $79.9\%$ accuracy using SVM (support vector machines) and a small selection of well-motivated, intuitive features.
+In many cases, definiteness is clear from the determiner, as with \emph{a} and \emph{the}. Noun phrases with \emph{a} (and \emph{an}) are predominantly indefinite, and those with \emph{the} are always definite. The analysis described in this paper assumes that these particular determiners cover enough cases to serve as a significant portion of the problem, and that \emph{a}/\emph{an} always denote indefiniteness, and \emph{the} always denotes definiteness. The naive baseline accuracy starts pretty high: $69.1\%$---from a maximum likelihood estimate which simply uses the more common of the two markers (\emph{the}).
+
+This paper demonstrates an approach that achieves up to $79.9\%$ accuracy using SVM (support vector machines) and a small selection of well-motivated, intuitive features.
 I show that it's possible to recover information about definiteness from nearby nouns and similarly shallow features. I do this by replacing all determiners \emph{a}, \emph{an}, and \emph{the} with a special placeholder token, using the original form as the gold label (only distinguishing definite from indefinite). Additionally, I compare results of CRF (Conditional Random Field) sequence labeling against a SVM (Support Vector Machine) tagging each token alone.
 This is primarily a feature selection problem, and I focus on results comparing different subsets of features.
+
+
+
 
 
 
@@ -120,7 +127,7 @@ This linguistic analysis of understanding determiners at the level of definitene
 \subsection{Language generation}
 When generating language from a logical structure, co-referential noun phrases representing a single entity must surface fluently. It is unnatural to repeat a proper noun or an extended noun phrase when a pronoun would suffice. But context and focus shift as the discourse develops, eventually making any pronoun ambiguous, forcing the speaker to use a more explicit reference. Tracking this throughout a discourse requires understanding the shared information between hearer and speaker, which naturally shifts over time throughout the discourse.
 
-This is often modeled with centering theory---of which there are many variations, but they all involve some kind of stage that only supports or holds a limited number of entities. When generating natural language from the logical form of a series of events, we must track what alternatives are available at each point, in order to know what level of definiteness is most appropriate, which in turn will determine what sort of noun phrase we use---definite, indefinite, pronoun, etc. Syntactic binding also plays a role here, in determining whether we use a pronoun or a (reflexive) anaphor.
+This is often modeled with centering theory---of which there are many variations, but they all involve some kind of stage that only supports or holds a limited number of entities \citep{brennan:1987, grosz:1995, beaver:2000}. When generating natural language from the logical form of a series of events, we must track what alternatives are available at each point, in order to know what level of definiteness is most appropriate, which in turn will determine what sort of noun phrase we use---definite, indefinite, pronoun, etc. Syntactic binding also plays a role here, in determining whether we use a pronoun or a (reflexive) anaphor.
 
 Definiteness is just one part of anaphora generation, and this paper tackles only a partial, but integral, part of the problem. The aspect that is relevant here requires shallower understanding. If we use a full noun phrase more than once, we need to know when to use an indefinite description and when to use the definite form.
 
@@ -130,34 +137,14 @@ Definiteness is just one part of anaphora generation, and this paper tackles onl
 
 Some languages, like Russian and Korean, do not have determiners to denote definiteness; others, like Japanese and Hindi, have a few articles that convey some semantic level of indefiniteness, usually, or are used for other special purposes (such as to denote humans). % that's what the Japanese is doing, right?
 When translating between these languages and languages with overt definiteness markers, we must insert determiners that often have no parallel marker in the source text.
+There are a few papers discussing this particular in machine translation, but they are specific to only a few language pairs \citep{ishikawa:1995, siegel:1996}.
 
-For example, Google Translate renders each of the four alternations of ``A/The man bit a/the dog'' as \foreignlanguage{russian}{Человек укусил собаку.} Translating back into English produces ``A person bitten by a dog.'' I don't know Russian; it may be genuinely ambiguous, and only determinable via context; but I know that translating back into English accurately requires choosing the correct determiners, for which we need a model of definiteness (as well as anaphora / centering).
+For example, Google Translate renders each of the four alternations of ``A/The man bit a/the dog'' as \foreignlanguage{russian}{Человек укусил собаку.} Translating back into English produces ``A person bitten by a dog.'' Some Russian adjectives mark definiteness, but otherwise, it must be inferred from context or left ambiguous. But translating from Russian into English requires choosing appropriate determiners, for which we need a model of definiteness (in conjunction with a model of anaphora or centering).
 
-
-
-
-\noindent
-There are a few papers on the second of these applications, translation, but they are specific to only a few language pairs \citep{ishikawa:1995, siegel:1996}.
-
-\subsection{General contribution}
-This can explain why so little computational work exists on the subject, but the linguistic and philosophical literature on definiteness is much more developed.
-However
-
-These applications are useful to two specific niches of NLP, , and apply only in some cases of those areas.
-
-
-%% begin.rcode 'draw1eb', cache=TRUE, dependson='1run'
-%pKs = dpospois(unlist(res$Ks)[-(1:5)], lambda, log=TRUE)
-%loglikelihoods = unlist(res$loglikelihoods)[-(1:5)]
-
-%plot(exp(pKs + loglikelihoods), type='l',
-%     main='p(K | y)', xlab='Iteration', ylab='', log='y')
-%% end.rcode
-
-
-
-
-
+\smallskip
+These applications are useful to two specific niches of NLP, and apply only in some cases of those areas,
+which may explain why so little computational work exists on the subject.
+The linguistic and philosophical literature on definiteness is much more developed, and will be discussed later.
 
 
 
@@ -173,36 +160,124 @@ These applications are useful to two specific niches of NLP, , and apply only in
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  EXPERIMENT  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 \section{Experiment}
-The basic research question will be to determine what type of language models produce the best prediction of definiteness. Because English has determiners, any parsed document is ``labeled'' data. I will simply replace \emph{a} and \emph{the}'s with the placeholder \guillemotleft\textsc{det}\guillemotright, retaining the original token as the label for that token. While this is an artificial evaluation metric, it could be useful in both of the application scenarios. In anaphora generation, each instance has to be filled by either a full noun phrase, either definite or indefinite, or a pronoun. In the noun phrase case, a placeholder would be inserted by a first pass of the language generation model, and then resolved by the anaphora resolution pass. In machine translation, noun phrases translated from a determiner-less language to one with determiners could be padded with a placeholder, which would then be resolved by some post-processing step performed on just the target language.
+% The basic research question will be to determine what type of language models produce the best prediction of definiteness.
+Because English has determiners, every document is `labeled' data. However, because I want to use features deeper than simple surface tokens, I use the WSJ portion of the Penn Treebank (see Table \ref{tab:wsjoverview}).
+\begin{table}
+  \centering
+  \begin{tabular}{r@{$\;\,$}l}
+    2,038 & articles \\
+    1,027,820 & tokens \\
+    77,377 & determiners \\
+  \end{tabular}
+  \caption{WSJ overview.}
+  \label{tab:wsjoverview}
+\end{table}
+\newcommand\detplaceholder{\guillemotleft\textsc{det}\guillemotright}
+To test definiteness inference, I simply replace \emph{a(n)} and \emph{the}'s with the placeholder \detplaceholder{}, while retaining the original token as the label for that token (collapsing \emph{a} and \emph{an} into one representation). While this is an artificial evaluation metric, it could be useful in both of the application scenarios.
 
-My project will consist of evaluating different models for predicting the deleted marker; it is not a typical sequence labeling problem, since relatively few of the tokens need to be resolved. But neither is each instance independent of the previous; in fact, a prior mention is presumably a strong indicator that an entity is now in the active context, and subsequent instances should use the definite determiner. The sequence is crucial in a sense of building and maintaining a `center,' which is a common approach when resolving anaphora \citep{grosz:1995, beaver:2000}.
-% brennan:1987
-But with an intelligent set of features, we might achieve sufficient accuracy with a simple logistic regression; given a set of features, evaluate whether the placeholder should be definite or indefinite?
+In the language generation case, a noun phrase would surface with a placeholder inserted in determiner position, which could then be resolved by the approach in this paper, using nearby features to infer definiteness. Similarly, in machine translation, noun phrases translated from a determiner-less language to one with determiners could be padded with a placeholder, which would then be resolved by this post-processing step performed on just the target language.
 
-My investigation will also compare feature sets, to determine which are the most efficient at predicting the deleted definiteness markers. Is the parse structure important, or just the surrounding tokens? Position in sentence / document? One presumably useful feature would be to use a cumulative index for each token type in the document---1 for the first instance, 2 for the second, and so on---which might handle the prior mention issue without requiring a sequence model.
+\subsection{Features and Model}
+Here are the features that I use, along with the names describing them in the graphs that follow.
+\begin{description}
+  \item[def na] `NA' if this particular token is not a \detplaceholder{} position.
+  \item[def token] Either \detplaceholder{} or the original token.
+  \item[next def token] Either \detplaceholder{} or the original token for the position directly following the target position.
+  \item[next noun] The next token found in the sequence labeled with one of the Penn Treebank POS tags: NN, NNS, NNP, or NNPS.
+  \item[next noun seen] Whether or not the `next noun' occurs earlier in the article.
+\end{description}
 
-WSJ
+This is not a typical sequence labeling problem, since relatively few of the tokens need to be resolved. Most of the sequential aspect of anaphors and shifting context is handled by the preprocessing step. However, I compare using an SVM\footnote{SVM$^{light}$ \citep{joachims:1999} via \href{https://bitbucket.org/wcauchois/pysvmlight}{PySVMLight}.} to using a CRF\footnote{CRFSuite \citep{CRFsuite}.}.
+Each instance of definiteness is not independent of the previous---in fact, a prior mention is a strong indicator that an entity is now in the active context, and that subsequent instances should use the definite determiner. The sequence is crucial in a sense of building and maintaining a `center,' which is a common approach when resolving anaphora.
+% But with an intelligent set of features, we might achieve sufficient accuracy with a simple logistic regression; given a set of features, evaluate whether the placeholder should be definite or indefinite?
+In addition to the learning method, I also compare feature sets, to determine which are the most efficient at predicting the deleted definiteness markers.
 
-2038 articles
-1027820 tokens total.
-77377 determiner tokens,
+\begin{figure}
+  \centering
+  \begin{tikzpicture}
+    \tikzset{edge from parent/.style={draw,-latex}}
+    \Tree
+    [.{def na}
+      [.\node(deftoken){def token};
+        \node(nextdef){next def};
+        [.{next noun}
+          \node(nextnounseen){next noun seen};
+        ]
+      ]
+    ]
+    \node(full)[below=of deftoken,yshift=-1.5in]{full};
+    \draw[-latex] (nextdef) -- (full);
+    \draw[-latex] (nextnounseen) -- (full);
+  \end{tikzpicture}
+  \caption{Hierarchy of inclusion of features in experimental feature sets.}
+\end{figure}
 
+%% begin.rcode 'svm_kernel', cache=TRUE
+svm = read.table('../python/det/svm.tsv', header=T)
+data = svm[svm$feature_function=='full',] #$
+ggplot(data, aes(
+       x=total_articles_count,
+       y=correct / total,
+       colour=kernel)) +
+  geom_line() +
+  geom_hline(yintercept=.691) +
+  annotate("text", 1500, .695, label="Baseline") +
+  theme_grey(base_size = 18) +
+  theme(
+    plot.title=element_text(vjust=1),
+    axis.title.x=element_text(vjust=-.2),
+    axis.title.y=element_text(vjust=.33)) +
+  labs(title="SVM - Full feature set", colour='Kernel',
+       x='Total articles used (train + test)', y='Accuracy')
+%% end.rcode
 
-\section{}
+%% begin.rcode 'svm_ffs', cache=TRUE
+svm = read.table('../python/det/svm.tsv', header=T)
+data = svm[svm$kernel=='polynomial',] #$
+ggplot(data, aes(
+  x=total_articles_count,
+  y=correct / total,
+  colour=feature_function)) +
+  geom_line() +
+  labs(title="SVM (polynomial) - Features", colour='Feature function',
+       x='Total articles used (train + test)', y='Accuracy') +
+  annotate("text", 1500, .705, label="Baseline") +
+  geom_hline(yintercept=.691) +
+  theme_grey(base_size=18) +
+  theme(
+    plot.title=element_text(vjust=1),
+    axis.title.x=element_text(vjust=-.2),
+    axis.title.y=element_text(vjust=.33))
+%% end.rcode
 
+%% begin.rcode 'crf_ffs', cache=TRUE
+crf = read.table('../python/det/crf.tsv', header=T)
+ggplot(crf, aes(
+  x=total_articles_count,
+  y=correct / total,
+  colour=feature_function)) +
+  geom_line() +
+  labs(title="CRF - Feature comparison", colour='Feature function',
+       x='Total articles used (train + test)', y='Accuracy') +
 
+  annotate("text", 1500, .705, label="Baseline") +
+  geom_hline(yintercept=.691) +
+  theme_grey(base_size=18) +
+  theme(
+    plot.title=element_text(vjust=1),
+    axis.title.x=element_text(vjust=-.2),
+    axis.title.y=element_text(vjust=.33))
+%% end.rcode
 
+% \section{Semantics of definiteness}
+% The theoretical semantics of definite noun phrases has an extensive history; we can start with Gottlob Frege and Bertrand Russell and names. Frege said that the meaning of a name (or definite noun phrase) was the object denoted by that description. Russell complicated matters with his ``The King of France is bald'' example, in which ``the King of France'' cannot refer to anything (at least not since 1848). Russell would call this sentence false, despite the description's failure to refer to anything; the failure of the noun phrase propagates out to the failure of the sentence.
 
-\section{Semantics of definiteness}
-The theoretical semantics of definite noun phrases has an extensive history; we can start with Gottlob Frege and Bertrand Russell and names. Frege said that the meaning of a name (or definite noun phrase) was the object denoted by that description. Russell complicated matters with his ``The King of France is bald'' example, in which ``the King of France'' cannot refer to anything (at least not since 1848). Russell would call this sentence false, despite the description's failure to refer to anything; the failure of the noun phrase propagates out to the failure of the sentence.
+% Keith Donnellan and P. F. Strawson disagree; they say that referencing is something speakers, not words, do, and that ``the King of France'' is simply unsuccessful.
+% Compare ``a King of France is bald,'' which can refer to any (dead) past King of France, and thus have a truth value. Definite noun phrase usually denote a unique entity, and if this fails, the sentence is incoherent. But compare ``After you enter the lobby, take the elevator to the 13th floor,'' which is acceptable even if there is more than one elevator.
+% % Donnellan differentiates between attributive and referential uses of definite noun phrases, but that's not important here.
 
-Keith Donnellan and P. F. Strawson disagree; they say that referencing is something speakers, not words, do, and that ``the King of France'' is simply unsuccessful.
-Compare ``a King of France is bald,'' which can refer to any (dead) past King of France, and thus have a truth value. Definite noun phrase usually denote a unique entity, and if this fails, the sentence is incoherent. But compare ``After you enter the lobby, take the elevator to the 13th floor,'' which is acceptable even if there is more than one elevator.
-% Donnellan differentiates between attributive and referential uses of definite noun phrases, but that's not important here.
-
-This is just the beginning, but it's clear that the difference between definite and indefinite noun phrases involves a number of factors, such as context, real world knowledge, and other pragmatic phenomena. It is an active field of study in linguistics or philosophy of language, but has received very little attention in computational linguistics.
+% This is just the beginning, but it's clear that the difference between definite and indefinite noun phrases involves a number of factors, such as context, real world knowledge, and other pragmatic phenomena. It is an active field of study in linguistics or philosophy of language, but has received very little attention in computational linguistics.
 
 
 
@@ -234,33 +309,22 @@ Using a combination of preference rules with defaults, handles translating sever
 % Many more languages than Japanese lack determiners; many more than German have them. It would be preferable to start with research considering the problem at a more general level. The rules she proposes may have correlates in other language pairs; I don't know how transferable these transfer rules are, but their lexical specificity suggests that even if the rules would be similar for, say, English, they are not general enough to extended across languages automatically.
 % Siegel does not demonstrate that her transfer rules are better at translating than simpler pre- or post-processing rules. This research is very early in machine translation, before the statistical revolution, but she relies on intuition rather than results.
 % My project investigates how much can be achieved via non-aligned surface-level models. It is not only a translation problem, but one aspect of semantics which has a major application in translation, particularly by improving post-processing of the translation system's output. Comparing this to a baseline, my approach could itself become a baseline for claims like Siegel's, since I address just one of the three factors that Siegel claims this problem depends on. If her approach does significantly better than the post-processing of my model, that would be substantial support for her claim of interlingual dependence, and justify further research into inferring definiteness placeholders on the source language, so that they can be translated.
-
-
-\subsubsection*{Conclusion}
-
-Siegel doesn't discuss translating German back to Japanese; is it sufficient to simply drop most German determiners and number morphology? If so, are there easy ways to predict which things get dropped? Are there other issues that arise in the interaction between these two languages? Further, I'm curious if Japanese--Russian translation is easier, because those languages both lack determiners.
-
-My project is a cross-section of some of issues raised in \citet{siegel:1996}. Instead of looking at a particular language pair,
-
-I'm investigating the recoverability of definiteness markers at the surface level---on the target language, in a translation scenario. This is more general; whereas language pairs are quadratic in the number of languages handled by the translation system, and translation between them requires a large number of parallel texts, surface-level post-processing depends only on the target language and does not require the same depth of annotation. This means much more data can be put to use, more easily.
-
-
-
-
-
-
+% I'm investigating the recoverability of definiteness markers at the surface level---on the target language, in a translation scenario. This is more general; whereas language pairs are quadratic in the number of languages handled by the translation system, and translation between them requires a large number of parallel texts, surface-level post-processing depends only on the target language and does not require the same depth of annotation. This means much more data can be put to use, more easily.
 
 \section{Limitations and future work}
-
 Currently, this system uses POS tags provided with the corpus as features in the training as well as the testing phase. As previously mentioned, determiners are useful features in POS tagging, so this inter-dependence could potentially become a catch-22. However, I think that the difference between \emph{a/an} and \emph{the} should not be too egregious an issue for a POS tagger; I expect that a POS tagger trained on a corpus with anonymized determiners would learn to use the merged placeholder `DET' just as well.
 
 A bigger issue is that \emph{a} and \emph{the} are blindly used as indicators of definiteness. While the corpus developed in \citet{vieira:2000} is relatively small, their approach suggests that some measure of definiteness / specificity could be induced from crowdsourced annotations. Active learning could be used to label the less amibiguous determiners (like \emph{the}, \emph{that}), leaving definiteness annotations of more ambiguous determiners and quantifiers (like \emph{a}, \emph{this}, \emph{some}) to human judges.
 
+\section{Conclusion}
+
+
+
 \section*{Appendix}
 
 Code written to perform the analyses in this project is available at \href{https://github.com/chbrown/nlp}{github.com/chbrown/nlp}.
-This document is licensed \href{http://creativecommons.org/licenses/by/3.0/}{CC BY 3.0}, Copyright 2013 Christopher Brown.
-You are free to distribute this report among the class, should such an effort arise.
+
+This document is licensed \href{http://creativecommons.org/licenses/by/3.0/}{CC BY 3.0}, \copyright{} 2013 Christopher Brown.
 
 \bibliography{/Users/chbrown/Dropbox/ut/tex/liography}
 
@@ -268,50 +332,6 @@ You are free to distribute this report among the class, should such an effort ar
 
 
 
-
-
-
-
-
-% first variation: using -SEEN- flags
-Training on 1825 articles, testing on 203.
-#tokens: 1027820
-Results
-   78 predicted=INDEF -> gold=DEF
- 2429 predicted=DEF -> gold=INDEF
-100364 predicted=NA -> gold=NA
-   80 predicted=INDEF -> gold=INDEF
- 5580 predicted=DEF -> gold=DEF
-
-% Results using the nearest NN* token as a feature for the determiner.
-    2 predicted=DEF -> gold=NA
-50315 predicted=NA -> gold=NA
-  556 predicted=DEF -> gold=INDEF
- 2133 predicted=DEF -> gold=DEF
-  545 predicted=INDEF -> gold=DEF
-  858 predicted=INDEF -> gold=INDEF
-
-% also using an article-wide preprocessing step of tracking seen nouns
-    2 predicted=DEF -> gold=NA
-50315 predicted=NA -> gold=NA
-  687 predicted=DEF -> gold=INDEF
- 2318 predicted=DEF -> gold=DEF
-  360 predicted=INDEF -> gold=DEF
-  727 predicted=INDEF -> gold=INDEF
-
-% tracking all nouns for the SEEN features, not just the first one after each DT
-  511 predicted=INDEF -> gold=DEF
- 1355 predicted=DEF -> gold=INDEF
-100364 predicted=NA -> gold=NA
- 1154 predicted=INDEF -> gold=INDEF
- 5147 predicted=DEF -> gold=DEF
-
-% and with explicit markers for NA def_tokens
- 1226 predicted=INDEF -> gold=DEF
-  613 predicted=DEF -> gold=INDEF
-100364 predicted=NA -> gold=NA
- 1896 predicted=INDEF -> gold=INDEF
- 4432 predicted=DEF -> gold=DEF
 
 
 
@@ -332,38 +352,9 @@ scikit-learn
 
 Matrix decomposition in Java: http://code.google.com/p/decomposer/
 
-
-# SVM
-Linear kernel, all of WSJ:
-Preprocessing WSJ
-Processed 1027820 tokens
-Training on 69639 determiners, testing on 7738.
-gold_labels Counter({1: 5361, -1: 2377})
-Correct: 6076, Wrong: 1662
-
-RBF:
-Preprocessing WSJ
-Processed 1027820 tokens
-Training on 69639 determiners, testing on 7738.
-gold_labels Counter({1: 5361, -1: 2377})
-Correct: 6145, Wrong: 1593
-
-Polynomial kernel:
-Training on 69639 determiners, testing on 7738.
-gold_labels Counter({1: 5361, -1: 2377})
-Correct: 6186, Wrong: 1552
-
-Sigmoid:
-Training on 69639 determiners, testing on 7738.
-gold_labels Counter({1: 5361, -1: 2377})
-Correct: 5349, Wrong: 2389
-(A lot faster, though!)
-
 LaSVM:
 la test
-_______
 loading model: 49246 svs
-loading "wsj_svm-test.data"..
 examples: 7738   features: 13268
 accuracy= 69.2815 (5361/7738)
 
