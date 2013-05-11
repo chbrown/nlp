@@ -232,7 +232,7 @@ SVM results use a polynomial kernel. The first plot below shows that a polynomia
 
 \begin{figure}
 %% begin.rcode 'svm_kernel', cache=TRUE
-svm = read.table('../python/det/svm.tsv', header=T)
+svm = read.table('../data/svm.tsv', header=T)
 data = svm[svm$feature_function=='full',] #$
 ggplot(data, aes(
        x=total_articles_count,
@@ -256,7 +256,7 @@ The full feature set consistently performs the highest (see Figure \ref{fig:svmf
 
 \begin{figure}
 %% begin.rcode 'svm_ffs', cache=TRUE
-svm = read.table('../python/det/svm.tsv', header=T)
+svm = read.table('../data/svm.tsv', header=T)
 data = svm[svm$kernel=='polynomial',] #$
 ggplot(data, aes(
   x=total_articles_count,
@@ -282,7 +282,7 @@ The SVM seems better suited to the problem, and its results are a few percentage
 
 \begin{figure}
 %% begin.rcode 'crf_ffs', cache=TRUE
-crf = read.table('../python/det/crf.tsv', header=T)
+crf = read.table('../data/crf.tsv', header=T)
 ggplot(crf, aes(
   x=total_articles_count,
   y=correct / total,
