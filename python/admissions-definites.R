@@ -1,23 +1,34 @@
 #options(stringsAsFactors = TRUE)
-admis = '/Users/chbrown/Dropbox/ut/nlp/project/admissions-definiteness.tsv'
+admis = '/Users/chbrown/corpora/admissions-selections/definites.tsv'
 admissions = read.delim(admis, header=TRUE, stringsAsFactors=F)
 admissions$gpa = as.numeric(admissions$gpa)
-admissions = admissions[!is.na(admissions$gpa) & admissions$wc != 0,]
-#admissions[is.na(admissions$det_ratio),]
+admissions = admissions[!is.na(admissions$sat) &
+                        !is.na(admissions$gpa) & 
+                        !admissions$gpa == 0 & 
+                        !admissions$wc == 0,]
 admissions$dets = admissions$indefinites + admissions$definites
 admissions$det_ratio = admissions$dets/admissions$wc
+with(admissions, smoothScatter(gpa, dets/wc))
+?smoothScatter
 
-View(admissions)
+#View(admissions)
 #admissions$gpa[192] == ''
 
-head(admissions)
+#head(admissions)
 intercept.lm = lm(gpa ~ 1, data=admissions)
 summary(intercept.lm)
-wc.lm = lm(sat ~ wc, data=admissions)
-summary(wc.lm)
-gpa.lm = lm(sat ~ det_ratio, data=admissions)
-summary(gpa.lm)
 
+wc.lm = lm(gpa ~ wc, data=admissions)
+summary(wc.lm)
+
+gpa.lm = lm(gpa ~ I(indefinites/wc) + I(definites/wc) + wc, data=admissions)
+summary(gpa.lm)
+anova(gpa.lm)
+
+gpa.aov = aov(gpa ~ I(indefinites/wc) + I(definites/wc) + wc + sat,
+              data=admissions)
+summary(gpa.aov)
+plot(gpa.aov)
 
 gpasat.lm = lm(gpa ~ sat, data=admissions)
 summary(gpasat.lm)

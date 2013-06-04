@@ -121,8 +121,15 @@ def ff_def_token(sentence, seen_nouns):
 
 
 def ff_next_def_token(sentence, seen_nouns):
-    # '''ff_next_def_token'''
     return [[def_token] for def_token in sentence.def_tokens[1:]] + [[]]
+
+
+def ff_next_def_token_plural(sentence, seen_nouns):
+    return [['PLURAL'] if def_token.endswith('s') else [] for def_token in sentence.def_tokens[1:]] + [[]]
+
+
+def ff_next_def_token_vowel(sentence, seen_nouns):
+    return [['VOWEL'] if def_token[0] in 'AEIOU' else [] for def_token in sentence.def_tokens[1:]] + [[]]
 
 
 def ff_next_noun(sentence, seen_nouns):
@@ -300,7 +307,6 @@ def run_baseline(article_count, split=0.9):
                     counts[def_tag] += 1
 
     mle = 'DEF' if counts['DEF'] > counts['INDEF'] else 'INDEF'
-    # print 'Using MLE', mle
 
     test_det_def_tags = []
     for article in test:
@@ -372,35 +378,44 @@ if __name__ == '__main__':
     parser.add_argument('--split', type=float, default=.9, help='Train/test split')
     opts = parser.parse_args()
 
-    # article_counts = [100, 250, 500, 1000, 2500]
-    article_counts = [2500]
+    # article_counts = [50, 100, 250, 500, 1000, 2040]
+    article_counts = [2038]
+    while article_counts[0] > 10:
+        article_counts.insert(0, int(article_counts[0] / 1.5))
+
+    # print article_counts
+
     feature_function_selections = [
         # (name, feature_function_list), pairs
-        ('ff_def_na', [ff_def_na]),
-        ('ff_def_token', [ff_def_na, ff_def_token]),
-        ('ff_next_def_token', [ff_def_na, ff_def_token, ff_next_def_token]),
-        ('ff_next_noun', [ff_def_na, ff_def_token, ff_next_noun]),
-        ('ff_next_noun_with_seen', [ff_def_na, ff_def_token, ff_next_noun, ff_next_noun_seen]),
-        ('full', [ff_def_na, ff_def_token, ff_next_def_token, ff_next_noun, ff_next_noun_seen]),
+        # ('def_na', [ff_def_na]),
+        # ('def_token', [ff_def_na, ff_def_token]),
+
+        # ('next_def_token', [ff_def_na, ff_def_token, ff_next_def_token]),
+        # ('next_def_token_plural', [ff_def_na, ff_def_token, ff_next_def_token_plural]),
+        # ('next_def_token_vowel', [ff_def_na, ff_def_token, ff_next_def_token_vowel]),
+        # ('next_noun', [ff_def_na, ff_def_token, ff_next_noun]),
+        # ('next_noun_with_seen', [ff_def_na, ff_def_token, ff_next_noun, ff_next_noun_seen]),
+        ('true_full', [ff_def_na, ff_def_token, ff_next_def_token, ff_next_noun, ff_next_noun_seen, ff_next_def_token_plural, ff_next_def_token_vowel]),
     ]
-    kernels = ['linear', 'polynomial', 'rbf', 'sigmoid']
+
+    kernels = ['polynomial']  # + ['linear', 'rbf', 'sigmoid']
 
     print_tab(headers)
 
     # BASELINE
-    for article_count in article_counts:
-        result = run_baseline(article_count, split=opts.split)
-        result['model'] = 'Baseline'
-        result['feature_function'] = 'MLE'
-        print_tab([result.get(key, 0) for key in headers])
+    # for article_count in article_counts:
+    #     result = run_baseline(article_count, split=opts.split)
+    #     result['model'] = 'Baseline'
+    #     result['feature_function'] = 'MLE'
+    #     print_tab([result.get(key, 0) for key in headers])
 
     # CRF
-    for article_count in article_counts:
-        for ff_label, feature_functions in feature_function_selections:
-            result = run_crf(article_count, feature_functions, split=opts.split, model_path=opts.model_path)
-            result['model'] = 'CRF'
-            result['feature_function'] = ff_label
-            print_tab([result.get(key, 0) for key in headers])
+    # for article_count in article_counts:
+    #     for ff_label, feature_functions in feature_function_selections:
+    #         result = run_crf(article_count, feature_functions, split=opts.split, model_path=opts.model_path)
+    #         result['model'] = 'CRF'
+    #         result['feature_function'] = ff_label
+    #         print_tab([result.get(key, 0) for key in headers])
 
     # SVM
     for article_count in article_counts:
